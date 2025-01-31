@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 from netCDF4 import Dataset
 import numpy as np
+import argparse
+
+parser = argparse.ArgumentParser(
+    description="prepare a velocity model from wasp, extracting from casc1.6 model"
+)
+parser.add_argument("lon", type=float, help="reference longitude (in absolute value)")
+args = parser.parse_args()
+
 
 # File path
 file_path = "data/casc1.6-velmdl.r1.1-n4.nc"
@@ -18,8 +26,9 @@ with Dataset(file_path, mode="r") as nc_file:
 extract_single_profile = True
 
 if extract_single_profile:
-    target_lon, target_lat = -124.5, 40.5
-    #target_lon, target_lat = -124, 40.5
+    target_lon, target_lat = -args.lon, 40.5
+    print(target_lon, target_lat)
+    # target_lon, target_lat = -124, 40.5
     distances = np.sqrt(np.power(lat - target_lat, 2) + np.power(lon - target_lon, 2))
     closest_index = np.argmin(distances)
     # Convert the flat index to 2D indices (row, col)
