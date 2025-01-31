@@ -1,0 +1,3 @@
+[submodule "submodules/seismic-waveform-factory"]
+	path = submodules/seismic-waveform-factory
+	url = https://github.com/Thomas-Ulrich/seismic-waveform-factory/
