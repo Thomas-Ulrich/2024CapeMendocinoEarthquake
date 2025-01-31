@@ -180,7 +180,7 @@ depth_first_layer_mantle = 196 - (depth_max_model - 20)
 mantle = f"""8.08 4.473 3.3754 {depth_first_layer_mantle} 1200.0 500.0
 8.594 4.657 3.4465 36.0 360.0 140.0"""
 
-with open("vel_model.txt", "w") as fid:
+with open("data/vel_model.txt", "w") as fid:
     fid.write(out)
     fid.write(mantle)
 
@@ -189,7 +189,7 @@ out = "H P_VEL S_VEL DENS QP QS\n"
 for i in range(n):
     out += f"{thick[i]} {vp[i]} {vs[i]} {rho[i]} {qa[i]} {qb[i]}\n"
 
-fn = "vel_model_axitra_fmt.txt"
+fn = "data/vel_model_axitra_fmt.txt"
 with open(fn, "w") as fid:
     fid.write(out)
 print(f"done writing {fn}")
