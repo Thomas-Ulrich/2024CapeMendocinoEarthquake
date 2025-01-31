@@ -3,7 +3,7 @@ from netCDF4 import Dataset
 import numpy as np
 
 # File path
-file_path = "casc1.6-velmdl.r1.1-n4.nc"
+file_path = "data/casc1.6-velmdl.r1.1-n4.nc"
 
 # Open the NetCDF file
 with Dataset(file_path, mode="r") as nc_file:
@@ -19,16 +19,16 @@ extract_single_profile = True
 
 if extract_single_profile:
     target_lon, target_lat = -124.5, 40.5
-    # target_lon, target_lat = -124, 40.5
+    #target_lon, target_lat = -124, 40.5
     distances = np.sqrt(np.power(lat - target_lat, 2) + np.power(lon - target_lon, 2))
     closest_index = np.argmin(distances)
     # Convert the flat index to 2D indices (row, col)
     closest_index_2d = np.unravel_index(closest_index, distances.shape)
-    print(lon[*closest_index_2d], lat[*closest_index_2d])
+    i, j = closest_index_2d
 
     # remove water layer
-    lateral_avg_Vp = Vp[:, *closest_index_2d]
-    lateral_avg_Vs = Vs[:, *closest_index_2d]
+    lateral_avg_Vp = Vp[:, i, j]
+    lateral_avg_Vs = Vs[:, i, j]
     first_non_zero = np.where(lateral_avg_Vs > 0)[0][0]
     lateral_avg_Vp[0:first_non_zero] = lateral_avg_Vp[first_non_zero]
     lateral_avg_Vs[0:first_non_zero] = lateral_avg_Vs[first_non_zero]
