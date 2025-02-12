@@ -1,8 +1,17 @@
+#!/usr/bin/env python3
 from netCDF4 import Dataset
 import numpy as np
+import argparse
+
+parser = argparse.ArgumentParser(
+    description="prepare a velocity model from wasp, extracting from casc1.6 model"
+)
+parser.add_argument("lon", type=float, help="reference longitude (in absolute value)")
+args = parser.parse_args()
+
 
 # File path
-file_path = "casc1.6-velmdl.r1.1-n4.nc"
+file_path = "data/casc1.6-velmdl.r1.1-n4.nc"
 
 # Open the NetCDF file
 with Dataset(file_path, mode="r") as nc_file:
@@ -17,17 +26,18 @@ with Dataset(file_path, mode="r") as nc_file:
 extract_single_profile = True
 
 if extract_single_profile:
-    target_lon, target_lat = -124.5, 40.5
+    target_lon, target_lat = -args.lon, 40.5
+    print(target_lon, target_lat)
     # target_lon, target_lat = -124, 40.5
     distances = np.sqrt(np.power(lat - target_lat, 2) + np.power(lon - target_lon, 2))
     closest_index = np.argmin(distances)
     # Convert the flat index to 2D indices (row, col)
     closest_index_2d = np.unravel_index(closest_index, distances.shape)
-    print(lon[*closest_index_2d], lat[*closest_index_2d])
+    i, j = closest_index_2d
 
     # remove water layer
-    lateral_avg_Vp = Vp[:, *closest_index_2d]
-    lateral_avg_Vs = Vs[:, *closest_index_2d]
+    lateral_avg_Vp = Vp[:, i, j]
+    lateral_avg_Vs = Vs[:, i, j]
     first_non_zero = np.where(lateral_avg_Vs > 0)[0][0]
     lateral_avg_Vp[0:first_non_zero] = lateral_avg_Vp[first_non_zero]
     lateral_avg_Vs[0:first_non_zero] = lateral_avg_Vs[first_non_zero]
@@ -179,7 +189,7 @@ depth_first_layer_mantle = 196 - (depth_max_model - 20)
 mantle = f"""8.08 4.473 3.3754 {depth_first_layer_mantle} 1200.0 500.0
 8.594 4.657 3.4465 36.0 360.0 140.0"""
 
-with open("vel_model.txt", "w") as fid:
+with open("data/vel_model.txt", "w") as fid:
     fid.write(out)
     fid.write(mantle)
 
@@ -188,7 +198,7 @@ out = "H P_VEL S_VEL DENS QP QS\n"
 for i in range(n):
     out += f"{thick[i]} {vp[i]} {vs[i]} {rho[i]} {qa[i]} {qb[i]}\n"
 
-fn = "vel_model_axitra_fmt.txt"
+fn = "data/vel_model_axitra_fmt.txt"
 with open(fn, "w") as fid:
     fid.write(out)
 print(f"done writing {fn}")
