@@ -146,7 +146,7 @@ def reduce(rho):
     return [*rho[0:4], *rho[4:10:2], *rho[10::4]]
 
 
-reduce_nb_layers = True
+reduce_nb_layers = False
 if not reduce_nb_layers:
     dens, vp, vs, qa, qb, thick = [
         val.data
@@ -189,14 +189,19 @@ depth_first_layer_mantle = 196 - (depth_max_model - 20)
 mantle = f"""8.08 4.473 3.3754 {depth_first_layer_mantle} 1200.0 500.0
 8.594 4.657 3.4465 36.0 360.0 140.0"""
 
+mantle_axitra = f"""{depth_first_layer_mantle} 8.08 4.473 3.3754 1200.0 500.0
+10e3 8.594 4.657 3.4465 360.0 140.0"""
+
 with open("data/vel_model.txt", "w") as fid:
     fid.write(out)
     fid.write(mantle)
 
-thick[-1] = 10000.0
+# thick[-1] = 10000.0
 out = "H P_VEL S_VEL DENS QP QS\n"
 for i in range(n):
     out += f"{thick[i]} {vp[i]} {vs[i]} {rho[i]} {qa[i]} {qb[i]}\n"
+
+out += mantle_axitra
 
 fn = "data/vel_model_axitra_fmt.txt"
 with open(fn, "w") as fid:
