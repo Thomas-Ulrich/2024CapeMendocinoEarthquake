@@ -10,16 +10,16 @@
             "delta_dip": 2.85,
             "delta_strike": 3.6959999999999997,
             "dip": 90.0,
-            "dip_subfaults": 9,
+            "dip_subfaults": 10,
             "hyp_dip": 4,
-            "hyp_stk": 17,
+            "hyp_stk": 7,
             "max_vel": 3.125,
             "min_vel": 1.0,
             "neighbours": [],
             "rake": -170.17294404607912,
             "rupture_vel": 2.5,
-            "stk_subfaults": 25,
-            "strike": 276.0
+            "stk_subfaults": 24,
+            "strike": 96.0
         }
     ]
 }
