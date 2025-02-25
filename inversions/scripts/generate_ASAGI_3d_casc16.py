@@ -58,12 +58,27 @@ def ProjectData2utm(x, y, z, vp, myproj):
     for k in range(0, nz):
         mydata = fill(vp[k, :, :].T)
         fVp = RegularGridInterpolator(
-            (x, y), mydata, fill_value=np.nanmean(mydata), bounds_error=False
+            # (x, y), mydata, fill_value=np.nanmean(mydata), bounds_error=False
+            (x, y),
+            mydata,
+            fill_value=np.nan,
+            bounds_error=False,
         )
         VPg = fVp(coords_grid)
         VPg = VPg.reshape(np.shape(Xg))
         vp_utm[k, :, :] = VPg
-    return X_utm, Y_utm, z, vp_utm
+
+    nanz, nany, nanx = np.where(np.isnan(vp_utm))
+
+    def extract_range_non_nan(nums):
+        sorted_nums = sorted(set(nums))
+        # Extract the last element of the first sequence and the first element of the second sequence
+        for i in range(len(sorted_nums) - 1):
+            if sorted_nums[i + 1] - sorted_nums[i] > 1:  # Detect jump in sequence
+                return sorted_nums[i] + 1, sorted_nums[i + 1]
+
+    y0, y1 = extract_range_non_nan(nany)
+    return X_utm, Y_utm[y0:y1], z, vp_utm[:, y0:y1, :]
 
 
 file_path = "data/casc1.6-velmdl.r1.1-n4.nc"
@@ -102,8 +117,6 @@ with Dataset(file_path, mode="r") as nc_file:
         y[0] - (y[1] - y[0]),
         num_layers_to_add,
     )
-
-    print(vs.shape)
     # Concatenate the extensions to the original arrays
     vs = np.concatenate((vs_extension, vs), axis=1)
     vp = np.concatenate((vp_extension, vp), axis=1)
