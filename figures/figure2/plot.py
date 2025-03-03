@@ -39,6 +39,9 @@ kinematic_inv_gnss_syn = pd.read_csv('./kinematic_inv_gnss_syn.csv')
 cpt = Cpt('./slip.cpt')
 
 stf = pd.read_csv('./stf.csv')
+stf = stf[stf.time <= 21]
+stf = pd.concat([stf, pd.DataFrame([[21, 0]], columns=['time', 'Moment_Rate'])])
+
 
 region=[-125.3, -123.6, 40, 41]
 fig = pygmt.Figure()
@@ -125,10 +128,10 @@ fig.text(position='TL', no_clip=True, text='(c)', font='12p,Helvetica,black', of
 
 ### panel b #####
 fig.shift_origin(yshift='16c')
-fig.basemap(projection='X18.7c/7c', region=[9.7, 98.5, -28., 0], frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
+fig.basemap(projection='X18.7c/7c', region=[0, 88.8, -28., 0], frame=['Wbnr', 'xa10f5', 'ya5+lalong dip [km]'])
 dist_dip = 0
 for along_dip in range(10):
-    dist_stk = 9.7
+    dist_stk = 0
     for  along_stk in range(24):
         subfault = kinematic_inv.iloc[along_dip * 24 + along_stk]
         r = dist_stk
@@ -145,7 +148,7 @@ fig.plot(x = repeating_cat.along_stk_disloc, y=-repeating_cat.depth, style='c0.1
 fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
 fig.text(position='TL', no_clip=True, text='(b)', font='12p,Helvetica,black', offset='-0.8c/0.5c')
 with pygmt.config(FONT_LABEL='24p,Helvetica,black', FONT_ANNOT_PRIMARY='24p,Helvetica,black'):
-    fig.colorbar(frame=['xa1f0.5+lSlip [m]', 'ya0.5'], position='g102/-3.5+w4c/0.3c', cmap='slip.cpt')
+    fig.colorbar(frame=['xa1f0.5+lSlip [m]', 'ya0.5'], position='g90/-3.5+w4c/0.3c', cmap='slip.cpt')
     
 ### panel b inset ###
 fig.shift_origin(yshift='0.0c', xshift='0.0c')
@@ -157,8 +160,8 @@ with pygmt.config(FONT_LABEL='6p,Helvetica-Bold,black', FONT_ANNOT_PRIMARY='6p,H
 
 
 ### panel a #####
-fig.shift_origin(yshift='8.0c')
-fig.basemap(projection='X18.7c/7c', region=[0, 100, -20, 0], frame=['WNbr', 'xa10f5+lalong strike [km]', 'ya5+lalong dip [km]'])
+fig.shift_origin(yshift='7.5c')
+fig.basemap(projection='X18.7c/5.6c', region=[0, 88.8, -20., 0], frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
 for i, row in static_inv.iterrows():
     fig.plot(x=[row.r, row.l, row.l, row.r], y=-np.array([row.t, row.t, row.b, row.b]), pen='0.5p,gray', close=True, fill=cpt(row.slip))
 cc = 100

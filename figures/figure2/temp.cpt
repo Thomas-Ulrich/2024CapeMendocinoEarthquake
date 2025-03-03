@@ -1,0 +1,8 @@
+0	0/0/127	0.5	blue	L
+0.5	blue	1.5	cyan	L
+1.5	cyan	2.5	yellow	L
+2.5	yellow	3.5	red	L
+3.5	red	4	127/0/0	B
+B	black
+F	white
+N	128
