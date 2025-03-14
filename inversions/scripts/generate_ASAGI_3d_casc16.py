@@ -84,13 +84,16 @@ def ProjectData2utm(x, y, z, vp, myproj):
 
 
 file_path = "data/casc1.6-velmdl.r1.1-n4.nc"
+# file_path = "data/casc1.6_downsampled.nc"
 with Dataset(file_path, mode="r") as nc_file:
     # Read variables
     x = nc_file.variables["x"][:]
     y = nc_file.variables["y"][:]
     z = -nc_file.variables["depth"][:].astype(float)
-    vp = nc_file.variables["Vp"][:] / 1000.0  # P-wave velocity
-    vs = nc_file.variables["Vs"][:] / 1000.0  # S-wave velocity
+    var = "Vp" if "Vp" in nc_file.variables else "vp"
+    vp = nc_file.variables[var][:] / 1000.0  # P-wave velocity
+    var = "Vs" if "Vs" in nc_file.variables else "vs"
+    vs = nc_file.variables[var][:] / 1000.0  # S-wave velocity
     nz, ny, nx = vp.shape
 
     newny = int(ny * 0.2)
@@ -103,6 +106,7 @@ with Dataset(file_path, mode="r") as nc_file:
     for j in range(ny):
         for i in range(nx):
             first_non_zero = np.where(vs[:, j, i] > 0)[0]
+            # print(i, j, first_non_zero)
             if first_non_zero.size > 0:
                 first_index = first_non_zero[0]
                 # Set water layer to first non-zero value
@@ -153,14 +157,41 @@ with Dataset(file_path, mode="r") as nc_file:
 
     idx = get_shift_coastline()
 
-    vs_extension = generate_extension(vs, num_layers_to_add, 3, idx)
-    vp_extension = generate_extension(vp, num_layers_to_add, 5.0, idx)
+    extension_south = False
+    if extension_south:
+        vs_extension = generate_extension(vs, num_layers_to_add, 3.1, idx)
+        vp_extension = generate_extension(vp, num_layers_to_add, 5.1, idx)
 
-    # Concatenate the extensions to the original arrays
-    vs = np.concatenate((vs_extension, vs), axis=1)
-    vp = np.concatenate((vp_extension, vp), axis=1)
-    y = np.concatenate((y_extension, y))
-    print(vs.shape)
+        # Concatenate the extensions to the original arrays
+        vs = np.concatenate((vs_extension, vs), axis=1)
+        vp = np.concatenate((vp_extension, vp), axis=1)
+        y = np.concatenate((y_extension, y))
+        print(vs.shape)
+
+    extension_top = False
+    if extension_top:
+        num_layers_to_add = 3
+        vs_extension = np.repeat(vs[0:1, :, :], num_layers_to_add, axis=0)
+        vp_extension = np.repeat(vp[0:1, :, :], num_layers_to_add, axis=0)
+        z_extension = np.linspace(
+            z[0] - num_layers_to_add * (z[1] - z[0]),
+            z[0] - (z[1] - z[0]),
+            num_layers_to_add,
+        )
+
+        vs = np.concatenate((vs_extension, vs), axis=0)
+        vp = np.concatenate((vp_extension, vp), axis=0)
+        z = np.concatenate((z_extension, z))
+
+    var = "Vs"
+    writeNetcdf(
+        f"casc1.6_utm_{var}",
+        [x, y, z],
+        [var],
+        [vs],
+        paraview_readable=True,
+    )
+
 
 myproj = "+proj=tmerc +datum=WGS84 +k=0.9996 +lon_0=-125.02 +lat_0=40.37"
 X_utm, Y_utm, Z_utm, vp_utm = ProjectData2utm(x, y, z, vp, myproj)

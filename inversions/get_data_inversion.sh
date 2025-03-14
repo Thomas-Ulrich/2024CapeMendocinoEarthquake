@@ -66,6 +66,8 @@ if [[ "$prepare_velocity_model" == "y" || "$prepare_velocity_model" == "Y" ]]; t
     
     FILE="data/casc1.6-velmdl.r1.1-n4.nc"  
     echo "Downloading casc1.6..."
+    echo "this will download the 5km sampled model. For the full resolution model, go to https://www.sciencebase.gov/catalog/item/59f1e68be4b0220bbd9dd4b4"
+
     wget -O "$FILE" "https://cvm.cascadiaquakes.org/data/download-netcdf/?filename=casc1.6-velmdl.r1.1-n4.json"
 
     scripts/prepare_velocity_model.py
