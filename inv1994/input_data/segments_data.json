@@ -1,0 +1,25 @@
+{
+    "rise_time": {
+        "delta_rise": 1.0,
+        "min_rise": 1.0,
+        "windows": 4
+    },
+    "segments": [
+        {
+            "delay_segment": 0,
+            "delta_dip": 2.6999999999999997,
+            "delta_strike": 3.2131578947368418,
+            "dip": 80.0,
+            "dip_subfaults": 11,
+            "hyp_dip": 4,
+            "hyp_stk": 11,
+            "max_vel": 3.125,
+            "min_vel": 1.0,
+            "neighbours": [],
+            "rake": 175.58257920900672,
+            "rupture_vel": 2.5,
+            "stk_subfaults": 22,
+            "strike": 274.0
+        }
+    ]
+}

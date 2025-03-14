@@ -3,6 +3,8 @@ from netCDF4 import Dataset
 from scipy.interpolate import RegularGridInterpolator
 from pyproj import Transformer
 from asagiwriter import writeNetcdf
+import pyvista as pv
+from scipy.interpolate import interp1d
 
 
 def extend_z_vp(z, vp, n_added=3):
@@ -107,22 +109,58 @@ with Dataset(file_path, mode="r") as nc_file:
                 vs[0:first_index, j, i] = vs[first_index, j, i]
                 vp[0:first_index, j, i] = vp[first_index, j, i]
 
-    # Extend the model towards y min
+    def generate_extension(array, num_layers_to_add, vmin, idxcoastline):
+        # Extend the model towards y min
+        idxmin = 0  # Assuming idxmin corresponds to the minimum index along the y-axis
+        ref0 = array[:, idxmin : idxmin + 1, :]
+        idx = np.where(x < 355000)[0]
+        ref1 = np.copy(ref0)
+        ref1[:, :, idx] = np.maximum(vmin, ref0[:, :, idx])
+        # Initialize the extended array
+        extension = np.empty((ref0.shape[0], num_layers_to_add, ref0.shape[2]))
+
+        for i in range(num_layers_to_add):
+            shift = idxcoastline[i]
+            ref = ref0 if i > num_layers_to_add - 5 else ref1
+            if shift > 0:
+                for k in range(shift):
+                    extension[:, i, k] = ref[:, 0, 0]
+                extension[:, i, shift:] = ref[:, 0, :-shift]
+            else:
+                extension[:, i, :] = ref[:, 0, :]
+        return extension
+
     num_layers_to_add = newny
-    idxmin = 0  # Assuming idxmin corresponds to the minimum index along the y-axis
-    vs_extension = np.repeat(vs[:, idxmin : idxmin + 1, :], num_layers_to_add, axis=1)
-    vp_extension = np.repeat(vp[:, idxmin : idxmin + 1, :], num_layers_to_add, axis=1)
+    shift_per_layer = 0.4
+
     y_extension = np.linspace(
         y[0] - num_layers_to_add * (y[1] - y[0]),
         y[0] - (y[1] - y[0]),
         num_layers_to_add,
     )
+
+    def get_shift_coastline():
+        mesh = pv.read("../figures/pvcc_vtk/CoastLine_long_EPSG_32610.vtk")
+        nodes = mesh.points
+        # Remove duplicates while keeping the first occurrence
+        unique_y, unique_indices = np.unique(nodes[:, 1], return_index=True)
+        unique_x = nodes[unique_indices, 0]
+
+        cubic_interp = interp1d(unique_y, unique_x, kind="cubic")
+        coastline_x = cubic_interp(y_extension)
+        idx = np.searchsorted(x, coastline_x)
+        return idx - idx[-1]
+
+    idx = get_shift_coastline()
+
+    vs_extension = generate_extension(vs, num_layers_to_add, 3, idx)
+    vp_extension = generate_extension(vp, num_layers_to_add, 5.0, idx)
+
     # Concatenate the extensions to the original arrays
     vs = np.concatenate((vs_extension, vs), axis=1)
     vp = np.concatenate((vp_extension, vp), axis=1)
     y = np.concatenate((y_extension, y))
     print(vs.shape)
-
 
 myproj = "+proj=tmerc +datum=WGS84 +k=0.9996 +lon_0=-125.02 +lat_0=40.37"
 X_utm, Y_utm, Z_utm, vp_utm = ProjectData2utm(x, y, z, vp, myproj)
