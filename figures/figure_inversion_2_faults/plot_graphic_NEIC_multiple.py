@@ -264,9 +264,11 @@ def plot_waveform_fits(
         return
     files = sorted(files, key=lambda k: (k["azimuth"], k["component"]))
     if additional_files:
-        additional_files = [
-            file for file in additional_files if file["component"] in components
-        ]
+        if type_str == "body" or type_str == "surf":
+            additional_files = [
+                file for file in additional_files if file["component"] in components
+            ]
+
         additional_files = sorted(
             additional_files, key=lambda k: (k["azimuth"], k["component"])
         )
@@ -293,6 +295,17 @@ def plot_waveform_fits(
         dt * np.arange(-start, len(observed) - start)
         for dt, start, observed in zip(sampling, start_waveform, obs_waveforms)
     ]
+
+    if additional_files:
+        shift_additional_file = [
+            f1["start_signal"] - f2["start_signal"]
+            for f1, f2 in zip(files, additional_files)
+        ]
+        # syn_times need to be udpate to account for potential different shift match
+        additional_syn_times = [
+            arr - dt * shift_additional_file[k] for k, arr in enumerate(syn_times)
+        ]
+
     numrows_phase = len(files) // 3 + 1
     fig, axes = plt.subplots(
         max(3, numrows_phase), 3, figsize=(20, int(2.2 * numrows_phase))
@@ -326,7 +339,7 @@ def plot_waveform_fits(
         if additional_files:
             axes2 = plot_waveforms(
                 list(axes2),
-                syn_times,
+                additional_syn_times,
                 additional_syn_waveforms,
                 weights,
                 type_str=type_str,
@@ -363,7 +376,20 @@ def plot_waveform_fits(
             comp=comp,
             color="red",
             custom="syn",
+            yrel_annotation_max=0.5,
         )
+        if additional_files:
+            axes2 = plot_waveforms(
+                axes2,
+                additional_syn_times,
+                additional_syn_waveforms,
+                weights,
+                type_str=type_str,
+                comp=comp,
+                color="blue",
+                custom="syn",
+                yrel_annotation_max=0.8,
+            )
 
         dict = {
             "weights": weights,
@@ -399,6 +425,31 @@ def plot_waveform_fits(
     return
 
 
+def retrieve_addition_traces(directory, data_type, stations=None):
+    if data_type == "body":
+        config_file = "tele_waves.json"
+        syn_file = "synthetics_body.txt"
+    elif data_type == "surf":
+        config_file = "surf_waves.json"
+        syn_file = "synthetics_surf.txt"
+    elif data_type == "strong":
+        config_file = "strong_motion_waves.json"
+        syn_file = "synthetics_strong.txt"
+    additional_traces_info = []
+    with open(directory / config_file) as t:
+        additional_traces_info = json.load(t)
+    additional_traces_info = get_outputs.get_data_dict(
+        additional_traces_info,
+        syn_file=syn_file,
+        directory=directory,
+    )
+    if stations:
+        additional_traces_info = [
+            file for file in additional_traces_info if file["name"] in stations
+        ]
+    return additional_traces_info
+
+
 def plot_misfit(
     used_data_type: List[str],
     directories: Union[pathlib.Path, str] = pathlib.Path(),
@@ -428,21 +479,12 @@ def plot_misfit(
         if stations:
             traces_info = [file for file in traces_info if file["name"] in stations]
 
-        additional_traces_info = []
-        if len(directories) > 1:
-            with open(directories[1] / "tele_waves.json") as t:
-                additional_traces_info = json.load(t)
-            additional_traces_info = get_outputs.get_data_dict(
-                additional_traces_info,
-                syn_file="synthetics_body.txt",
-                directory=directories[1],
-            )
-            if stations:
-                additional_traces_info = [
-                    file for file in additional_traces_info if file["name"] in stations
-                ]
+        additional_traces_info = (
+            retrieve_addition_traces(directories[1], "body", stations)
+            if len(directories)
+            else []
+        )
 
-        print(traces_info[0].keys())
         values = [["BHZ"], ["SH"]]
         for components in values:
             plot_waveform_fits(
@@ -463,10 +505,22 @@ def plot_misfit(
         traces_info = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_surf.txt", margin=0, directory=directory
         )
+        if stations:
+            traces_info = [file for file in traces_info if file["name"] in stations]
+
+        additional_traces_info = (
+            retrieve_addition_traces(directories[1], "surf", stations)
+            if len(directories)
+            else []
+        )
         values = [["BHZ"], ["SH"]]
         for components in values:
             plot_waveform_fits(
-                traces_info, components, "surf", plot_directory=directory
+                traces_info,
+                components,
+                "surf",
+                plot_directory=directory,
+                additional_files=additional_traces_info,
             )
     if "strong" in used_data_type:
         if not os.path.isfile(directory / "strong_motion_waves.json"):
@@ -478,6 +532,13 @@ def plot_misfit(
         traces_info = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_strong.txt", directory=directory
         )
+        if stations:
+            traces_info = [file for file in traces_info if file["name"] in stations]
+        additional_traces_info = (
+            retrieve_addition_traces(directories[1], "strong", stations)
+            if len(directories)
+            else []
+        )
         values = [["HLZ", "HNZ"], ["HLE", "HNE"], ["HLN", "HNN"]]
         plot_waveform_fits(
             traces_info,
@@ -485,6 +546,7 @@ def plot_misfit(
             "strong",
             start_margin=10,
             plot_directory=directory,
+            additional_files=additional_traces_info,
         )
     if "cgps" in used_data_type:
         if not os.path.isfile(directory / "cgps_waves.json"):
@@ -514,16 +576,44 @@ if __name__ == "__main__":
         help="inversion folder separated by ','",
     )
     parser.add_argument(
-        "--stations",
-        nargs=1,
-        help="station list.n values separated by ','",
+        "waveform_types",
+        help="waveform types (e.g. body,surf,strong) , separated by ','",
     )
 
+    parser.add_argument(
+        "--stations_body",
+        nargs=1,
+        help="stations for body waves. n values separated by ','",
+    )
+    parser.add_argument(
+        "--stations_surf",
+        nargs=1,
+        help="stations for surface waves. n values separated by ','",
+    )
+    parser.add_argument(
+        "--stations_strong",
+        nargs=1,
+        help="stations for strong waves. n values separated by ','",
+    )
     args = parser.parse_args()
 
     directories = args.input_folders.split(",")
-    stations = None
-    if args.stations:
-        stations = args.stations[0].split(",")
+    waveform_types = args.waveform_types.split(",")
 
-    plot_misfit(["body"], directories, stations)
+    if "body" in waveform_types:
+        stations = None
+        if args.stations_body:
+            stations = args.stations_body[0].split(",")
+        plot_misfit(["body"], directories, stations)
+
+    if "surf" in waveform_types:
+        stations = None
+        if args.stations_surf:
+            stations = args.stations_surf[0].split(",")
+        plot_misfit(["surf"], directories, stations)
+
+    if "strong" in waveform_types:
+        stations = None
+        if args.stations_strong:
+            stations = args.stations_strong[0].split(",")
+        plot_misfit(["strong"], directories, stations)
