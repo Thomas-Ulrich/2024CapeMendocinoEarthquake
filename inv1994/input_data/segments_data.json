@@ -7,19 +7,19 @@
     "segments": [
         {
             "delay_segment": 0,
-            "delta_dip": 2.6999999999999997,
-            "delta_strike": 3.2131578947368418,
-            "dip": 80.0,
-            "dip_subfaults": 11,
+            "delta_dip": 2.85,
+            "delta_strike": 2.85,
+            "dip": 90.0,
+            "dip_subfaults": 10,
             "hyp_dip": 4,
-            "hyp_stk": 11,
+            "hyp_stk": 13,
             "max_vel": 3.125,
             "min_vel": 1.0,
             "neighbours": [],
-            "rake": 175.58257920900672,
+            "rake": -180.0,
             "rupture_vel": 2.5,
-            "stk_subfaults": 22,
-            "strike": 274.0
+            "stk_subfaults": 25,
+            "strike": 94.0
         }
     ]
 }

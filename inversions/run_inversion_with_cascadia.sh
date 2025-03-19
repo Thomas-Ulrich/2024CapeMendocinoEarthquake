@@ -3,7 +3,7 @@ set -euo pipefail
 
 #lon=124.5
 lon=124.75
-myfolder=rest2seg${lon}
+myfolder=rest_wca${lon}
 
 # Prompt for user input
 echo "Do you want to rerun the gps (y/n)"
@@ -27,8 +27,8 @@ if [[ "$rerun_gps" == "y" ]]; then
 
    #python scripts/prepare_velocity_model_canvas.py $lon
    python scripts/prepare_velocity_model.py $lon
-   cp input_data/segments_data_extra_seg.json ${myfolder}_$suffix/segments_data.json
-   cp input_data/model_space_extra_seg.json ${myfolder}_$suffix/model_space.json
+   cp input_data/segments_data_with_cascadia.json ${myfolder}_$suffix/segments_data.json
+   cp input_data/model_space_with_cascadia.json ${myfolder}_$suffix/model_space.json
    cp input_data/annealing_prop.json ${myfolder}_$suffix
    #cp input_data/tensor_info.json ${myfolder}_$suffix
    cp data/vel_model.txt ${myfolder}_$suffix

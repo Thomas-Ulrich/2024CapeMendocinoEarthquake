@@ -1,0 +1,19 @@
+{
+    "centroid_depth": 15.0,
+    "centroid_lat": 40.59,
+    "centroid_lon": -125.78,
+    "datetime": "1994-09-01T15:15:53",
+    "depth": 10.0,
+    "half_duration": 8.3,
+    "lat": 40.402,
+    "lon": -125.680,
+    "moment_mag": 3.877781049680636e+26,
+    "mpp": 8.19e+25,
+    "mrp": 1.754e+26,
+    "mrr": -2.05e+25,
+    "mrt": -4.08e+25,
+    "mtp": -3.395e+26,
+    "mtt": -6.14e+25,
+    "time_shift": 7.4,
+    "timedelta": 963512194.634
+}
