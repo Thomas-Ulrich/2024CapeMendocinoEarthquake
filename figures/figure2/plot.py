@@ -19,11 +19,18 @@ class Cpt:
             return self.cpt_o.iloc[1, 1]
         else:
             return self.cpt.iloc[idx, 1]
-        
-        
-repeating_cat = pd.read_csv('./repeating_earthquakes.csv')
+
 cat = pd.read_csv('./aftershocks.csv')
+cat['time'] = pd.to_datetime(cat['time'])
+cat = cat[cat.time > pd.to_datetime('2024-12-05T18:44:21')]
+
+       
 cat_on_fault = pd.read_csv('./aftershocks_on_fault.csv')
+cat_on_fault['time'] = pd.to_datetime(cat_on_fault['time'])
+cat_on_fault = cat_on_fault[cat_on_fault.time > pd.to_datetime('2024-12-05T18:44:21')]
+
+
+repeating_cat = pd.read_csv('./repeating_earthquakes.csv')
 background = pd.read_csv('./background_seismicity.csv')
 mainshock = pd.read_csv('./mainshock.csv')
 
@@ -61,15 +68,29 @@ fig.plot(
     data='./faults.gmt',
     pen="1p,black",
 )
-
+cc = 100
+fig.plot(
+    x=background.lon,
+    y=background.lat,
+    style="c0.05c",
+    fill=f'{cc}/{cc}/{cc}',
+)
+fig.plot(
+    x=repeating_cat.lon,
+    y=repeating_cat.lat,
+    style="c0.1c",
+    fill='red',
+)
 fig.plot(
     x=cat.lon,
     y=cat.lat,
-    style="c1p",
-    fill="black",
+    style="c0.07c",
+    fill="cyan",
 )
 spec="e60/0.39+f18"
-fig.plot(x=fault_cords.lon, y=fault_cords.lat, pen='1,cyan', close=True)
+fig.plot(x=fault_cords.lon, y=fault_cords.lat, pen='1.8p,black', close=True)
+fig.plot(x=fault_cords.lon, y=fault_cords.lat, pen='1p,cyan', close=True)
+
 disp = gnss[['id', 'lon', 'lat', 'E', 'N']]
 fig.velo(
     data=disp.iloc[:, 1:],
@@ -143,7 +164,7 @@ for along_dip in range(10):
     dist_dip -= 2.8
 cc = 100
 fig.plot(x = background.along_stk_disloc, y=-background.depth, style='c0.05c', fill=f'{cc}/{cc}/{cc}')
-fig.plot(x = cat_on_fault.along_stk_disloc, y=-cat_on_fault.depth, style='c0.05c', fill='cyan')
+fig.plot(x = cat_on_fault.along_stk_disloc, y=-cat_on_fault.depth, style='c0.1c', fill='cyan')
 fig.plot(x = repeating_cat.along_stk_disloc, y=-repeating_cat.depth, style='c0.1c', fill='red')
 fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
 fig.text(position='TL', no_clip=True, text='(b)', font='12p,Helvetica,black', offset='-0.8c/0.5c')
@@ -166,7 +187,7 @@ for i, row in static_inv.iterrows():
     fig.plot(x=[row.r, row.l, row.l, row.r], y=-np.array([row.t, row.t, row.b, row.b]), pen='0.5p,gray', close=True, fill=cpt(row.slip))
 cc = 100
 fig.plot(x = background.along_stk_disloc, y=-background.depth, style='c0.05c', fill=f'{cc}/{cc}/{cc}', label='background seismicity')
-fig.plot(x = cat_on_fault.along_stk_disloc, y=-cat_on_fault.depth, style='c0.05c', fill='cyan', label='aftershocks')
+fig.plot(x = cat_on_fault.along_stk_disloc, y=-cat_on_fault.depth, style='c0.1c', fill='cyan', label='aftershocks')
 fig.plot(x = repeating_cat.along_stk_disloc, y=-repeating_cat.depth, style='c0.1c', fill='red', label='repeating earthquakes')
 fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
 
@@ -175,6 +196,9 @@ fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill
 fig.text(position='TL', no_clip=True, text='(a)', font='12p,Helvetica,black', offset='-0.8c/0.5c')
 fig.legend(position='n0.01/0.01', box='+ggray')
 
+
+
+fig.show(width=1200)
 
 
 fig.savefig('./figure2.pdf')
