@@ -35,6 +35,7 @@ fig.plot(
 fig.plot(data='./output.gmt', pen='1p,black', close=True)
 fig.plot(data='./SAF_Men.gmt', pen='2p,red')
 fig.plot(data='./cascedia.gmt', pen='2p,red', style='f1.5c/0.5c+r+t+p0.5p,red')
+
 fig.meca(spec=cmt_small.iloc[:, 3:], longitude=cmt_small.lon, latitude=cmt_small.lat, scale=0.5, pen='0.5p', convention='mt', depth=cmt_small.depth, cmap='cmt.cpt')
 fig.meca(spec=cmt_large.iloc[:, 3:], longitude=cmt_large.lon, latitude=cmt_large.lat, scale=0.5, pen='0.5p', convention='mt', depth=cmt_large.depth, cmap='cmt.cpt', event_name=cmt_large.name)
 fig.text(x=-125.15, y=41.3, text='Cascadia Subduction Zone', font='12p,red', angle=-75)
@@ -61,12 +62,19 @@ event_data = pd.DataFrame({
 event_data = pd.concat([event_data, focal_df], axis=1)
 
 # Plot the beachball using GCMT convention
-fig.meca(spec=event_data, scale="3c", offset=True) 
-fig.text(x=-125.35, y=40.374, text='December 5, 2024 @[M_{w}@[7.0', font='10p', angle=0, offset='0/-1c')
-
+fig.meca(spec=event_data, scale="2c", offset=True) 
+fig.text(x=-126.0, y=40.57, text='1994@[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='0/-0.5c')
+fig.text(x=-125.35, y=40.374, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='0/-1c')
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-125.83, y=40.45, style="v0.5c+ea+r+h0.1+a35", direction=([180], [1.5]), pen="1p,red", fill="red")
+
+span_1994={'lon':[-126.046, -125.286], 'lat':[40.422, 40.381]}
+span_2024={'lon':[-125.247, -124.490], 'lat':[40.383, 40.303]}
+
+fig.plot(x=span_1994["lon"], y=span_1994["lat"], pen = "10p,black@80%")
+fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
+
 fig.basemap(map_scale="n0.8/0.95+w100k+f+u")
 
 ##############################################################################################################################################################################################################################################################################
@@ -146,14 +154,16 @@ event_data = pd.DataFrame({
 # Add the focal mechanism DataFrame to the event DataFrame
 event_data = pd.concat([event_data, focal_df], axis=1)
 
+fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 # Plot the beachball using GCMT convention
 fig.meca(spec=event_data, scale="1.5c", offset=True) 
-fig.text(x=-125.022, y=40.345, text='December 5, 2024 @[M_{w}@[7.0', font='8p', angle=0, offset='0/-0.5c')
-
+fig.text(x=-125.022, y=40.345, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='8p', angle=0, offset='0/-0.5c')
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-125.83, y=40.45, style="v0.5c+ea+r+h0.1+a35", direction=([180], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=back_projection.lon, y=back_projection.lat, style="dd", size=0.4 * back_projection.beam_power, fill=back_projection.time, cmap='back_projection.cpt', pen='0.5p')
+
+
 # Add the color bar for depth
 with pygmt.config(FONT_LABEL='24p,Helvetica,black', FONT_ANNOT_PRIMARY='24p,Helvetica,black'):
     fig.colorbar(
