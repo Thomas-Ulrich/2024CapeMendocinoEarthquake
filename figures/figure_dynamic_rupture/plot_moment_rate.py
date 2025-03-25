@@ -51,7 +51,7 @@ use_tmax = False
 if use_tmax:
     fn = "../seissol_outputs/Solucion_strike_98_tmax23_1D/dyn_0008_coh0.25_1_B0.9_C0.2_R0.65-energy.csv"
 else:
-    fn = "../seissol_outputs/Solucion_strike_98_1D/dyn_0001_coh0.25_1_B0.9_C0.1_R0.6-energy.csv"
+    fn = "../seissol_outputs/energy_files/Solucion_strike_98_1D/dyn_0036_coh0.25_1_B1.0_C0.2_R0.55-energy.csv"
 
 add_seissol_data(ax, "kinematic informed", fn)
 

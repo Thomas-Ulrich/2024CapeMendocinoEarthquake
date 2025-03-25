@@ -50,6 +50,10 @@ stf = stf[stf.time <= 21]
 stf = pd.concat([stf, pd.DataFrame([[21, 0]], columns=['time', 'Moment_Rate'])])
 
 
+plot_kinematic = False
+plot_seismicity  = False
+
+
 region=[-125.3, -123.6, 40, 41]
 fig = pygmt.Figure()
 pygmt.config(FORMAT_GEO_MAP='ddd.xx', MAP_FRAME_TYPE='plain')
@@ -68,30 +72,34 @@ fig.plot(
     data='./faults.gmt',
     pen="1p,black",
 )
-cc = 100
-fig.plot(
-    x=background.lon,
-    y=background.lat,
-    style="c0.05c",
-    fill=f'{cc}/{cc}/{cc}',
-)
-fig.plot(
-    x=repeating_cat.lon,
-    y=repeating_cat.lat,
-    style="c0.1c",
-    fill='red',
-)
-fig.plot(
-    x=cat.lon,
-    y=cat.lat,
-    style="c0.07c",
-    fill="cyan",
-)
+
+if plot_seismicity:
+    cc = 100
+    fig.plot(
+        x=background.lon,
+        y=background.lat,
+        style="c0.05c",
+        fill=f'{cc}/{cc}/{cc}',
+    )
+    fig.plot(
+        x=repeating_cat.lon,
+        y=repeating_cat.lat,
+        style="c0.1c",
+        fill='red',
+    )
+    fig.plot(
+        x=cat.lon,
+        y=cat.lat,
+        style="c0.07c",
+        fill="cyan",
+    )
+
 spec="e60/0.39+f18"
 fig.plot(x=fault_cords.lon, y=fault_cords.lat, pen='1.8p,black', close=True)
 fig.plot(x=fault_cords.lon, y=fault_cords.lat, pen='1p,cyan', close=True)
 
 disp = gnss[['id', 'lon', 'lat', 'E', 'N']]
+
 fig.velo(
     data=disp.iloc[:, 1:],
     spec=spec,
@@ -106,13 +114,14 @@ fig.velo(
     line=True,
     vector="0.4c+e+gblue",
 )
-fig.velo(
-    data=kinematic_inv_gnss_syn[['lon', 'lat', 'E', 'N']],
-    spec=spec,
-    pen="2p,pink",
-    line=True,
-    vector="0.4c+e+gpink",
-)
+if plot_kinematic:
+    fig.velo(
+        data=kinematic_inv_gnss_syn[['lon', 'lat', 'E', 'N']],
+        spec=spec,
+        pen="2p,pink",
+        line=True,
+        vector="0.4c+e+gpink",
+    )
 size = 0.03
 fig.velo(
     data=[[-125.25, 40.87, size, 0]],
@@ -121,13 +130,16 @@ fig.velo(
     line=True,
     vector="0.4c+e+gblue",
 )
-fig.velo(
-    data=[[-125.25, 40.84, size, 0]],
-    spec=spec,
-    pen="2p,pink",
-    line=True,
-    vector="0.4c+e+gpink",
-)
+if plot_kinematic:
+    fig.velo(
+        data=[[-125.25, 40.84, size, 0]],
+        spec=spec,
+        pen="2p,pink",
+        line=True,
+        vector="0.4c+e+gpink",
+    )
+    fig.text(x=-125.25, y=40.84, text='Kinematic inversion', font="10p", offset='3.5c/0.0c') 
+
 fig.velo(
     data=[[-125.25, 40.9, size, 0]],
     spec=spec,
@@ -137,7 +149,6 @@ fig.velo(
 )
 fig.text(x=-125.25, y=40.9, text='3 cm', font="10p", offset='0.8c/0.5c')
 fig.text(x=-125.25, y=40.87, text='Static inversion', font="10p", offset='3.5c/0.0c') 
-fig.text(x=-125.25, y=40.84, text='Kinematic inversion', font="10p", offset='3.5c/0.0c') 
 fig.text(x=-125.25, y=40.9, text='Data', font="10p", offset='3.5c/0.0c')
 
 
@@ -170,7 +181,9 @@ fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill
 fig.text(position='TL', no_clip=True, text='(b)', font='12p,Helvetica,black', offset='-0.8c/0.5c')
 with pygmt.config(FONT_LABEL='24p,Helvetica,black', FONT_ANNOT_PRIMARY='24p,Helvetica,black'):
     fig.colorbar(frame=['xa1f0.5+lSlip [m]', 'ya0.5'], position='g90/-3.5+w4c/0.3c', cmap='slip.cpt')
-    
+
+
+
 ### panel b inset ###
 fig.shift_origin(yshift='0.0c', xshift='0.0c')
 with pygmt.config(FONT_LABEL='8p,Helvetica-Bold,black', FONT_ANNOT_PRIMARY='8p,Helvetica-Bold,black'):
