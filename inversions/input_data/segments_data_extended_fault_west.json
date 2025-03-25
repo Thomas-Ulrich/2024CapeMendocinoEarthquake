@@ -12,29 +12,14 @@
             "dip": 90.0,
             "dip_subfaults": 10,
             "hyp_dip": 4,
-            "hyp_stk": 7,
+            "hyp_stk": 19,
             "max_vel": 3.125,
             "min_vel": 1.0,
             "neighbours": [],
             "rake": -170.17294404607912,
             "rupture_vel": 2.5,
-            "stk_subfaults": 24,
+            "stk_subfaults": 36,
             "strike": 98.0
-        },
-        {
-            "delay_segment": 0,
-            "delta_dip": 3.3,
-            "delta_strike": 3.7,
-            "dip": 12,
-            "dip_subfaults": 9,
-            "hypocenter": {"lon": -124.78, "lat": 40.35, "depth": 8.0},
-            "hyp_dip": 1,
-            "hyp_stk": 5,
-            "neighbours": [],
-            "rake": 90,
-            "rupture_vel": 2.5,
-            "stk_subfaults": 15,
-            "strike": 335
         }
     ]
 }

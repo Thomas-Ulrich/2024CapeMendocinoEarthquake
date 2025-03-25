@@ -3,7 +3,7 @@ set -euo pipefail
 
 #lon=124.5
 lon=124.75
-myfolder=rest_wca${lon}
+myfolder=rwca${lon}
 
 # Prompt for user input
 echo "Do you want to rerun the gps (y/n)"

@@ -37,6 +37,7 @@ if [[ "$rerun_gps" == "y" ]]; then
    wasp manage update-inputs $(pwd) -p -m -a
    wasp model run $(pwd) manual_model_add_data 
    cp Solucion.txt plots
+   cp modelling_summary.txt plots
    cd ..
 fi
 
@@ -54,6 +55,7 @@ if [[ "$rerun_gps_tele" == "y" ]]; then
    wasp manage update-inputs $(pwd) -t surf
 
    cp Solucion.txt plots
+   cp modelling_summary.txt plots
    mv plots plots_gps_tele
 
    wasp process shift-match $(pwd) body -o auto
@@ -63,6 +65,7 @@ if [[ "$rerun_gps_tele" == "y" ]]; then
    echo "starting inv with teleseismics after shift-match"
    wasp model run $(pwd) manual_model_add_data 
    cp Solucion.txt plots
+   cp modelling_summary.txt plots
    mv plots plots_gps_tele_shift_match
    cd ..
 fi
@@ -81,6 +84,7 @@ if [[ "$rerun_gps_tele_strong" == "y" ]]; then
    ../../submodules/seismic-waveform-factory/scripts/modify_wasp_strong_motion_waves.py ../input_data/waveforms_config.ini
    wasp model run $(pwd) manual_model_add_data
    cp Solucion.txt plots
+   cp modelling_summary.txt plots
    mv plots plots_gps_tele_sm_shorter
    cd ..
    echo "done running inversion with strong motion (shorter)"
@@ -93,6 +97,7 @@ if [[ "$rerun_gps_tele_strong" == "y" ]]; then
    wasp process shift-match $(pwd) strong -o auto
    wasp model run $(pwd) manual_model_add_data
    cp Solucion.txt plots
+   cp modelling_summary.txt plots
    cd ..
    echo "done running inversion with strong motion (shorter + shift-match)"
 fi

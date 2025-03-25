@@ -419,7 +419,7 @@ def plot_waveform_fits(
     if type_str == "strong":
         plot_name = "strong_motion_waves"
 
-    plt.savefig(plot_directory / (plot_name + ".png"), dpi=300)  # bbox_inches='tight')
+    plt.savefig(plot_directory / (plot_name + ".png"), dpi=300, bbox_inches='tight')
     plt.savefig(plot_directory / (plot_name + ".ps"))
     plt.close()
     return

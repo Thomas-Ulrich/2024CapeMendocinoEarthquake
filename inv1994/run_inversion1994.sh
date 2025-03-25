@@ -23,7 +23,7 @@ fi
 if [[ "$rerun_auto" == "y" ]]; then
    wasp model run $(pwd) auto_model -g data/cmtsolution -t body -t surf -d data/Teleseismic_Data/
    cp 19940901151553/ffm.0/NP2 ${myfolder}_$suffix -r
-   rm -r 19940901151553/ffm.0/NP2
+   #rm -r 19940901151553
 fi
 
 
@@ -31,7 +31,7 @@ cp -r ${myfolder}_${suffix} ${myfolder}_up
 suffix=up
 
 cp input_data/vel_model.txt ${myfolder}_$suffix
-cp input_data/segments_data.json ${myfolder}_$suffix
+cp input_data/*.json ${myfolder}_$suffix
 cd ${myfolder}_${suffix}
 # obtaind with
 # python scripts/prepare_velocity_model.py 125.7
