@@ -41,11 +41,13 @@ def add_seissol_data(ax, label, fn):
     )
 
 
-add_seissol_data(
-    ax,
-    "geodetic informed",
-    "../seissol_outputs/one_segment_top_0_Yohai/dyn_0001_coh0.25_1_B0.9_C0.1_R0.6-energy.csv",
-)
+supershear_model = False
+if not supershear_model:
+    add_seissol_data(
+        ax,
+        "geodetic informed",
+        "../seissol_outputs/one_segment_top_0_Yohai/dyn_0001_coh0.25_1_B0.9_C0.1_R0.6-energy.csv",
+    )
 
 use_tmax = False
 if use_tmax:
@@ -54,6 +56,10 @@ else:
     fn = "../seissol_outputs/energy_files/Solucion_strike_98_1D/dyn_0036_coh0.25_1_B1.0_C0.2_R0.55-energy.csv"
 
 add_seissol_data(ax, "kinematic informed", fn)
+
+if supershear_model:
+    fn = "../seissol_outputs/energy_files/Solucion_strike_98_1D/dyn_0033_coh0.25_1_B1.0_C0.1_R0.7-energy.csv"
+    add_seissol_data(ax, "kinematic informed (40% supershear)", fn)
 
 
 usgs_mr = read_usgs_moment_rate("../../data/moment_rate.mr")
