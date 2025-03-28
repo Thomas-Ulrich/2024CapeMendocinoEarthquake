@@ -57,7 +57,6 @@ max_dCFS = np.zeros_like(Ts0) - np.inf
 dt = sx.ReadTimeStep()
 tags = sx.Read1dData("fault-tag", sx.nElements, isInt=True).astype(np.int32)
 
-
 for i in tqdm(range(end_idt)):
     T_s = sx.ReadData("T_s", i)
     T_d = sx.ReadData("T_d", i)
@@ -65,10 +64,22 @@ for i in tqdm(range(end_idt)):
     Shear_in_slip_direction = np.cos(rake) * T_s + np.sin(rake) * T_d
     max_dCFS = np.maximum(Shear_in_slip_direction + 0.6 * P_n, max_dCFS)
 
+n_average = 10
+print(f"averaging over the last {n_average} time steps for dCFS")
+T_s = 0
+T_d = 0
+P_n = 0
 
-T_s = sx.ReadData("T_s", sx.ndt - 1)
-T_d = sx.ReadData("T_d", sx.ndt - 1)
-P_n = sx.ReadData("P_n", sx.ndt - 1)
+for i in range(n_average):
+    k = sx.ndt - n_average + i
+    T_s += sx.ReadData("T_s", k)
+    T_d += sx.ReadData("T_d", k)
+    P_n += sx.ReadData("P_n", k)
+
+T_s /= n_average
+T_d /= n_average
+P_n /= n_average
+
 Shear_in_slip_direction = np.cos(rake) * T_s + np.sin(rake) * T_d
 dCFS = Shear_in_slip_direction + 0.6 * P_n
 
