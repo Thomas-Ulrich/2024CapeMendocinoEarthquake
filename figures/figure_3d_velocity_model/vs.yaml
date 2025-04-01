@@ -1,0 +1,13 @@
+!Switch
+[vs]: !EvalModel
+    parameters: [rho, mu, lambda]
+    model: !Switch
+        [rho, mu, lambda]: !Include yaml_files/material.yaml
+    components: !LuaMap
+      returns: [vs]
+      function: |
+        function f (x)
+          return {
+          vs = math.sqrt(x["mu"]/x["rho"]),
+          }
+        end
