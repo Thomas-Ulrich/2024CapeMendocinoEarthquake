@@ -46,8 +46,6 @@ kinematic_inv_gnss_syn = pd.read_csv('./kinematic_inv_gnss_syn.csv')
 cpt = Cpt('./slip.cpt')
 
 stf = pd.read_csv('./stf.csv')
-stf = stf[stf.time <= 21]
-stf = pd.concat([stf, pd.DataFrame([[21, 0]], columns=['time', 'Moment_Rate'])])
 
 back_projection = pd.read_csv('../figure1/back_projection.csv')
 
@@ -175,8 +173,8 @@ fig.plot(
     x=cat.lon,
     y=cat.lat,
     style="c0.05c",
-    fill="darkgray",
-    label='Lomax catalog'
+    fill="cyan",
+    #label='Lomax catalog'
 )
 
 fig.plot(data='../figure1/output.gmt', pen='1p,black', close=True)
@@ -208,7 +206,7 @@ event_data = pd.concat([event_data, focal_df], axis=1)
 
 fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 # Plot the beachball using GCMT convention
-fig.meca(spec=event_data, scale="1.5c", offset=True) 
+#fig.meca(spec=event_data, scale="1.5c", offset=True) 
 fig.text(x=-125.022, y=40.345, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='8p', angle=0, offset='0/-0.5c')
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
@@ -252,15 +250,16 @@ with pygmt.config(FONT_LABEL='24p,Helvetica,black', FONT_ANNOT_PRIMARY='24p,Helv
 
 ### panel b inset ###
 fig.shift_origin(yshift='0.0c', xshift='0.0c')
+ta,tb = -10, 40
 with pygmt.config(FONT_LABEL='8p,Helvetica-Bold,black', FONT_ANNOT_PRIMARY='8p,Helvetica-Bold,black'):
-    fig.basemap(projection='X4c/3c', region=[0.0001, 20.9999, 0.001, 6], frame=['tblr+gwhite'])
+    fig.basemap(projection='X4c/3c', region=[ta, tb, 0.001, 6], frame=['tblr+gwhite'])
 fig.plot(x=stf.time, y=stf.Moment_Rate / 1e18, pen='0.3p,black', close=True, fill='gray')
 ymax = np.amax(stf.Moment_Rate / 1e18)
 fig.plot(x=back_projection.time, y=ymax * back_projection.beam_power, pen='0.3p,blue', close=False)
 with pygmt.config(FONT_LABEL='6p,Helvetica-Bold,black', FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,black', MAP_FRAME_TYPE='inside'):
-    fig.basemap(projection='X4c/3c', region=[0.0001, 39.999, 0.001, 6], frame=['lNbE', 'xa10f5+ltime [s]', 'ya1+lMoment Rate [Nm @[10^{18}@[]'])
+    fig.basemap(projection='X4c/3c', region=[ta, tb, 0.001, 6], frame=['lNbE', 'xa10f5+ltime [s]', 'ya1+lMoment Rate [Nm @[10^{18}@[]'])
 with pygmt.config(FONT_LABEL='6p,Helvetica-Bold,blue', FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,blue', MAP_FRAME_TYPE='inside'):
-    fig.basemap(projection='X4c/3c', region=[0.0001, 39.999, 0.001, 6/ymax], frame=['lW', 'ya0.5+lBeam Power'])
+    fig.basemap(projection='X4c/3c', region=[ta, tb, 0.001, 6/ymax], frame=['lW', 'ya0.5+lBeam Power'])
 
 
 ### panel a #####
@@ -282,5 +281,6 @@ fig.legend(position='n0.01/0.01', box='+ggray')
 
 
 
-
-fig.savefig('./figure2.pdf')
+fn = './fig2.pdf'
+fig.savefig(fn)
+print(f"done writing {fn}")
