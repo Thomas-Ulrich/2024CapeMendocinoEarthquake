@@ -481,7 +481,7 @@ def plot_misfit(
 
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "body", stations)
-            if len(directories)
+            if len(directories)>1
             else []
         )
 
@@ -510,7 +510,7 @@ def plot_misfit(
 
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "surf", stations)
-            if len(directories)
+            if len(directories)>1
             else []
         )
         values = [["BHZ"], ["SH"]]
