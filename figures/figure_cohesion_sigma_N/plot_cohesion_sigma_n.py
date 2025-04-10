@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Matplotlib settings
+plt.rcParams["font.size"] = 13
+plt.rcParams["savefig.dpi"] = 500
+
 # Constants
 rho = 2700       # density in kg/m^3
 g = 9.81         # gravity in m/s^2
@@ -18,7 +22,7 @@ kappa_1 = 1.0    # MPa
 kappa = kappa_0 + kappa_1 * np.maximum(0, (z_coh - z) / z_coh)
 
 # Plotting
-fig, ax1 = plt.subplots(figsize=(6, 8))
+fig, ax1 = plt.subplots(figsize=(6, 6))
 
 # Plot σ_n on primary x-axis
 color1 = 'tab:blue'
@@ -32,9 +36,10 @@ ax1.invert_yaxis()  # Depth increases downward
 # Plot κ on secondary x-axis
 ax2 = ax1.twiny()
 color2 = 'tab:red'
-ax2.plot(kappa, z_km, color=color2, linestyle='--', label=r'$\kappa$ (MPa)')
+ax2.plot(kappa, z_km, color=color2, label=r'$\kappa$ (MPa)')
 ax2.set_xlabel('Frictional Cohesion κ (MPa)', color=color2)
 ax2.tick_params(axis='x', labelcolor=color2)
+ax1.set_xlim(-45, 5)
 
 # Title
 #plt.title('Depth Dependence of σₙ and κ')
