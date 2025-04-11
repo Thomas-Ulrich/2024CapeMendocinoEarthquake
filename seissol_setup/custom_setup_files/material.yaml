@@ -1,0 +1,23 @@
+!Switch
+[rho, mu, lambda]:  !IdentityMap
+  components:
+    - !AffineMap
+          matrix:
+            ua: [1.0, 0.0, 0.0]
+            ub: [0.0, 1.0, 0.0]
+            uc: [0.0, 0.0, 1.0]
+          translation:
+            ua: 0.0
+            ub: 0.0
+            uc: 0.0
+          components: !Any
+            - !ASAGI
+                file: ASAGI_files/casc16_ASAGI.nc
+                parameters: [rho, mu, lambda]
+                var: data
+                interpolation: linear
+            - !ConstantMap
+                map:
+                 rho: 3330.
+                 mu: 65942325000.
+                 lambda: 81235350000.
