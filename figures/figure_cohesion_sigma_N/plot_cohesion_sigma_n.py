@@ -17,8 +17,8 @@ sigma_n = np.minimum(-1e6, np.maximum(-40e6, -0.4 * rho * g * z)) / 1e6  # in MP
 
 # Frictional cohesion κ(z)
 z_coh = 6000     # in meters
-kappa_0 = 0.25   # MPa
-kappa_1 = 1.0    # MPa
+kappa_0 = -0.25   # MPa
+kappa_1 = -1.0    # MPa
 kappa = kappa_0 + kappa_1 * np.maximum(0, (z_coh - z) / z_coh)
 
 # Plotting
