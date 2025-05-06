@@ -1,7 +1,6 @@
 import seissolxdmf as sx
 import argparse
 import numpy as np
-import pandas as pd
 
 parser = argparse.ArgumentParser(
     description="compute fault area (area that slip more than 1cm"
@@ -28,7 +27,7 @@ cross0 = np.cross(
 face_area = 0.5 * np.apply_along_axis(np.linalg.norm, 1, cross0)
 
 ndt = sx.ReadNdt()
-slip = sx.ReadData("fault_slip", ndt - 1)
+slip = sx.ReadData("ASl", ndt - 1)
 
 slip_thres = 0.01
 face_area = face_area[slip > slip_thres]
@@ -45,6 +44,7 @@ def pivot_if_necessary(df):
 
 
 """
+# for reference but it does not work
 relevant_quantities = [
     "total_frictional_work",
     "static_frictional_work",
@@ -55,14 +55,16 @@ energy = energy[relevant_quantities]
 total_frictional_work = energy["total_frictional_work"].iloc[-1]
 static_frictional_work = energy["static_frictional_work"].iloc[-1]
 G = (2 * static_frictional_work - total_frictional_work) / ruptured_area
-
 print(f"rupture area: {ruptured_area/1e6} km2, fracture energy Gc={G:e}")
 """
 
 Pn0 = sx.ReadData("T_n", 0)[slip > slip_thres]
 mus = sx.ReadData("mu_s", 0)[slip > slip_thres]
-mud = 0.1
+mud = sx.ReadData("Mud", 0)[slip > slip_thres]
+
+ASl = slip[slip > slip_thres]
 dc = sx.ReadData("d_c", 0)[slip > slip_thres]
+dc = np.minimum(dc, ASl)
 
 Gc = np.sum(-(mus - mud) * face_area * dc * Pn0 * 0.5)
 Gc /= ruptured_area
