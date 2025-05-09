@@ -6,12 +6,22 @@ import matplotlib.pyplot as plt
 background_cat = pd.read_csv('./background_cat.csv')
 cmt_small = pd.read_csv('./cmt_cat_small.csv')
 cmt_large = pd.read_csv('./cmt_cat_large.csv')
+cmt_large2 = pd.read_csv('./cmt_cat_large2.csv')
 cat = pd.read_csv('./cat.csv')
 cat['time'] = pd.to_datetime(cat['time'])
 cat = cat[cat.time > pd.to_datetime('2024-12-05T18:44:21')]
 back_projection = pd.read_csv('./back_projection.csv')
 pygmt.makecpt(cmap='hot', series=[0, 15, 0.1], continuous=True, output='back_projection.cpt')
 kinematic_inv_stations = pd.read_csv('./kinematic_inv_stations.csv')
+
+import pygmt
+
+pygmt.makecpt(
+    cmap="viridis",   
+    series=[10, 35], 
+    output="cmt.cpt" 
+)
+
 
 
 
@@ -23,7 +33,8 @@ fig.coast(
     projection=f"M20",
     region=region1,
     land='lightgray',
-    water='lightblue'
+    water='lightblue',
+    shorelines="1/0.5p,black"
 )
 fig.plot(
     x=background_cat.lon,
@@ -33,14 +44,17 @@ fig.plot(
     label='background seismicity'
 )
 
-fig.plot(data='./output.gmt', pen='1p,black', close=True)
+fig.plot(data='./output.gmt', pen='0.1p,black', close=True)
 fig.plot(data='./SAF_Men.gmt', pen='2p,red')
 fig.plot(data='./cascedia.gmt', pen='2p,red', style='f1.5c/0.5c+r+t+p0.5p,red')
 
-fig.meca(spec=cmt_small.iloc[:, 3:], longitude=cmt_small.lon, latitude=cmt_small.lat, scale=0.5, pen='0.5p', convention='mt', depth=cmt_small.depth, cmap='cmt.cpt')
+fig.meca(spec=cmt_small.iloc[:, 3:], longitude=cmt_small.lon, latitude=cmt_small.lat, scale=0.25, pen='0.5p', convention='mt', depth=cmt_small.depth, cmap='cmt.cpt')
 fig.meca(spec=cmt_large.iloc[:, 3:], longitude=cmt_large.lon, latitude=cmt_large.lat, scale=0.5, pen='0.5p', convention='mt', depth=cmt_large.depth, cmap='cmt.cpt', event_name=cmt_large.name)
+# this event is used separately because the label is overprinted
+fig.meca(spec=cmt_large2.iloc[:, 3:], longitude=cmt_large2.lon, latitude=cmt_large2.lat, scale="0.5+o0/-1.0", pen='0.5p', convention='mt', depth=cmt_large2.depth, cmap='cmt.cpt', event_name=cmt_large2.name)
+
 aki_single = {"strike": 150, "dip": 47, "rake": 30, "magnitude": 7.2}
-fig.meca(spec=aki_single, longitude=-124.229, latitude=40.335, scale=0.5, pen='0.5p', convention='aki', depth=11, cmap='cmt.cpt', event_name='1992M7.2')
+fig.meca(spec=aki_single, longitude=-124.229, latitude=40.335, scale="0.5+o0/-0.03", pen='0.5p', convention='aki', depth=11, cmap='cmt.cpt', event_name='1992M7.2')
 fig.text(x=-125.15, y=41.3, text='Cascadia Subduction Zone', font='12p,red', angle=-75)
 fig.text(x=-124.18, y=39.95, text='SAF', font='12p,red', angle=-75)
 fig.plot(x=-123.95, y=39.8, style="v0.5c+ea+r+h0.1+a35", direction=([105], [1.5]), pen="1p,red", fill="red")
@@ -67,7 +81,7 @@ event_data = pd.concat([event_data, focal_df], axis=1)
 # Plot the beachball using GCMT convention
 fig.meca(spec=event_data, scale="2c", offset=True) 
 fig.text(x=-126.0, y=40.57, text='1994@[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='0/-0.5c')
-fig.text(x=-125.35, y=40.374, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='0/-1c')
+fig.text(x=-125.35, y=40.374, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='1.5c/-0.7c')
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-125.83, y=40.45, style="v0.5c+ea+r+h0.1+a35", direction=([180], [1.5]), pen="1p,red", fill="red")
@@ -78,10 +92,31 @@ span_2024={'lon':[-125.247, -124.490], 'lat':[40.383, 40.303]}
 fig.plot(x=span_1994["lon"], y=span_1994["lat"], pen = "10p,black@80%")
 fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 
+#coordinates of the 1992 fault plane
+#Murray et al., 1994, model A
+nodes = np.array([
+    [-124.43794499, 40.31782402, -1604.16418173],
+    [-124.37831422, 40.43251533, -1604.16418173],
+    [-124.29991785, 40.40863613, 11804.16418173],
+    [-124.35966056, 40.29398459, 11804.16418173]
+])
+
+# Extract lon and lat (ignore depth for surface plot)
+lon = nodes[:,0]
+lat = nodes[:,1]
+
+# Close the polygon by adding the first point again
+lon = np.append(lon, lon[0])
+lat = np.append(lat, lat[0])
+
+#fig.plot(x=lon, y=lat, pen="0p,blue", fill="blue@60", close=True)
+fig.plot(x=lon, y=lat, fill="blue@60", close=True)
+
+
 fig.basemap(map_scale="n0.8/0.95+w100k+f+u")
 
 #Add the color bar for depth
-with pygmt.config(FONT_LABEL='24p,Helvetica,black', FONT_ANNOT_PRIMARY='24p,Helvetica,black'):
+with pygmt.config(FONT_LABEL='16p,Helvetica,black', FONT_ANNOT_PRIMARY='16p,Helvetica,black'):
     fig.colorbar(
         cmap='cmt.cpt',  # Use the same colormap as in the mec plot
         position="JBC+w6c/0.3c+o-6c/-1.8c+h",  # Position of the color bar
@@ -101,7 +136,8 @@ fig.coast(
     region=region2,
     land='lightgray',
     water='lightblue',
-    borders=2
+    borders=2,
+    shorelines="1/0.5p,black"
 )
 fig.plot(data='./PB2002_boundaries.gmt', pen='1p,red')
 fig.text(x=-128.0, y=39.0, text="Pacific Plate", font="6p", angle=0)
@@ -124,7 +160,7 @@ fig.shift_origin(xshift='21c')
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['SM', 'GPS'])]
 
 region = [-125.2, t_stations.lon.max()+0.1, t_stations.lat.min()-0.1, t_stations.lat.max()+0.1]
-fig.coast(region=region, projection='M8.15c', frame=['lSnE', 'xa1.0', 'ya2'], land='lightgray', water='lightblue', area_thresh=10000)
+fig.coast(region=region, projection='M8.15c', frame=['lSnE', 'xa1.0', 'ya2'], land='lightgray', water='lightblue', area_thresh=10000, shorelines="1/0.5p,black")
 fig.text(position='TL', text='(b)', font='12p,Helvetica-Bold', offset='-0.5c/0.5c', no_clip=True)
 
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['GPS'])]
@@ -149,7 +185,7 @@ fig.legend(position='n1/1+jTR', box='+gwhite+p1p')
 
 
 fig.shift_origin(xshift='0.1c', yshift='0.1c')
-fig.coast(region='g', projection='A280/30/2i', frame=['xg20', 'yg20'], land='darkgray', water='lightblue', area_thresh=10000)
+fig.coast(region='g', projection='A280/30/2i', frame=['xg20', 'yg20'], land='darkgray', water='lightblue', area_thresh=10000, shorelines="1/0.1p,black")
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['surf'])]
 fig.plot(x=t_stations.lon, y=t_stations.lat, style='t0.3c', fill='black')
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['body'])]
