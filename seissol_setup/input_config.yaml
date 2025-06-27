@@ -7,11 +7,11 @@ custom_setup_files:
 - observations
 event_id: nc75095651
 fault_mesh_size: auto
-finite_fault_model: /import/exception-dump/ulrich/2024CapeMendocinoEarthquake/inversions/all_re98/re98124.75_gps_tl_sm2/Solucion_strike_98.param
-mesh: /import/memoryleak-dump/ulrich/Mendocino/mend_topo
+finite_fault_model: Solucion_strike_98.param
+mesh: mend_topo
 mu_delta_min: 0.02
 projection: +proj=tmerc +datum=WGS84 +k=0.9996 +lon_0=-125.02 +lat_0=40.37
-reference_moment_rate_function: /import/exception-dump/ulrich/2024CapeMendocinoEarthquake/inversions/all_re98/re98124.75_gps_tl_sm2/STF.txt
+reference_moment_rate_function: STF.txt
 regional_seismic_stations: NC.KRP,BK.SBAR,BK.THOM,BK.DMOR,NC.KMPB,BK.HUNT,BK.ETSL,BK.HALS,BK.MNDO
 tmax: null
-velocity_model: /import/exception-dump/ulrich/2024CapeMendocinoEarthquake/inversions/data/vel_model_axitra_fmt.txt
+velocity_model: vel_model_axitra_fmt.txt

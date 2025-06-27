@@ -1,0 +1,22 @@
+<freeSurface>34</freeSurface>
+<dynamicRupture>33</dynamicRupture>
+<absorbing>35,36,38,39,40,42</absorbing>
+<!--
+<boundaryCondition tag="65">41</boundaryCondition> 
+<boundaryCondition tag="66" name="cascadia">37</boundaryCondition> 
+<surfaceMSize value="2500">37,33</surfaceMSize>
+<surfaceMSize value="1000">41</surfaceMSize>
+-->
+<surfaceMSize value="300">33</surfaceMSize>
+<area_AspectRatio value="6"/>
+<vol_AspectRatio value="12"/>
+<SurfaceMeshing SmoothingLevel="1" SmoothingType="Gradient" DiscreteAngle="15.0" Snap="0"></SurfaceMeshing>
+<VolumeMeshing  SmoothingLevel="1" SmoothingType="Gradient" SetOptimisation="1"></VolumeMeshing>
+<gradation value="0.6"/>
+<globalMSize value="15000"/>
+<VelocityAwareMeshing easiFile="material.yaml" elementsPerWaveLength="3">
+    <VelocityRefinementCuboid frequency="0.5" centerX="16e3" centerY="-5e3" centerZ="-15e3"
+                              halfSizeX="70e3" halfSizeY="25e3" halfSizeZ="15e3" bypassFindRegionAndUseGroup="1" rotationZAnticlockwiseFromX="-8.0"/>
+    <VelocityRefinementCuboid frequency="0.05" centerX="0" centerY="0" centerZ="-27e3"
+                           halfSizeX="40e10" halfSizeY="15e10" halfSizeZ="33e3" bypassFindRegionAndUseGroup="1"/> 
+</VelocityAwareMeshing>

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+ <Domain>
+  <Grid Name="puml mesh" GridType="Uniform">
+   <Topology TopologyType="Tetrahedron" NumberOfElements="853720">
+    <DataItem NumberType="Int" Precision="8" Format="HDF" Dimensions="853720 4">mend_topo:/connect</DataItem>
+   </Topology>
+   <Geometry name="geo" GeometryType="XYZ" NumberOfElements="152815">
+    <DataItem NumberType="Float" Precision="8" Format="HDF" Dimensions="152815 3">mend_topo:/geometry</DataItem>
+   </Geometry>
+   <Attribute Name="group" Center="Cell">
+    <DataItem  NumberType="Int" Precision="4" Format="HDF" Dimensions="853720">mend_topo:/group</DataItem>
+   </Attribute>
+   <Attribute Name="boundary" Center="Cell">
+    <DataItem NumberType="Int" Precision="4" Format="HDF" Dimensions="853720">mend_topo:/boundary</DataItem>
+   </Attribute>
+  </Grid>
+ </Domain>
+</Xdmf>
