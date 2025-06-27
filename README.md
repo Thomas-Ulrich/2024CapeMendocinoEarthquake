@@ -1,21 +1,5 @@
 ## Dynamic Rupture Workflow for the Mw7 2024 Mendocino Earthquake
 
-
-The repository gathers inputs files and scripts used in our study of the 2024 Mw7.0 Cape Mendocino Earthquake (currently under review):
-
-Ulrich, T., Magen, Y., & Gabriel, A. A. (2025). The complex rupture dynamics of an oceanic transform fault: supershear rupture and deep slip during the 2024 Mw7. 0 Cape Mendocino Earthquake.
-https://doi.org/10.31223/X5XT7Q
-
-
-It lists
-
-- the code used for performing the kinematic inversions (`inversions` and `inv1994` folders)
-- The code used to generate the 3D velocity model (`inversions/scripts/generate_ASAGI_3d_casc16.py`)
-- The code to reproduce the manuscript figures (`figures` folder)
-- The code to generate a ensemble of dynamic rupture scenario and identify a preferred dynamic rupture scenario (see `seissol_setup` folder and detailed instructions in the README.md of the `seissol_setup` folder)
-
-## Dynamic Rupture Workflow for the Mw7 2024 Mendocino Earthquake
-
 This repository contains the input files and scripts used in our study of the 2024 Mw7.0 Cape Mendocino Earthquake, currently under review:
 
 > Ulrich, T., Magen, Y., & Gabriel, A. A. (2025). *The complex rupture dynamics of an oceanic transform fault: supershear rupture and deep slip during the 2024 Mw7.0 Cape Mendocino Earthquake*.  
