@@ -1,0 +1,10 @@
+{
+    "cooling_rate": 0.97,
+    "initial_temperature": 0.01,
+    "iterations": 250,
+    "max_source_dur": 30,
+    "moment_weight": 0.05,
+    "seismic_moment": 4.3716012490575285e+26,
+    "slip_weight": 0.1,
+    "time_weight": 0.1
+}
