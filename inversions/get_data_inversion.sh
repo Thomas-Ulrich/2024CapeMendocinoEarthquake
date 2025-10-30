@@ -43,7 +43,7 @@ fi
 if [[ "$download_teleseismic" == "y" || "$download_teleseismic" == "Y" ]]; then
     echo "Downloading Teleseismic data..."
     mkdir -p data/Teleseismic_Data
-    wasp manage acquire data/Teleseismic_Data data/cmtsolution -t body
+    ffm manage acquire data/Teleseismic_Data data/cmtsolution -t body
 else
     echo "Skipping Teleseismic download."
 fi
@@ -63,8 +63,8 @@ fi
 
 # Download Strong Motion data if needed
 if [[ "$prepare_velocity_model" == "y" || "$prepare_velocity_model" == "Y" ]]; then
-    
-    FILE="data/casc1.6-velmdl.r1.1-n4.nc"  
+
+    FILE="data/casc1.6-velmdl.r1.1-n4.nc"
     echo "Downloading casc1.6..."
     echo "this will download the 5km sampled model. For the full resolution model, go to https://www.sciencebase.gov/catalog/item/59f1e68be4b0220bbd9dd4b4"
 
@@ -74,5 +74,3 @@ if [[ "$prepare_velocity_model" == "y" || "$prepare_velocity_model" == "Y" ]]; t
 else
     echo "Skipping preparing velocity model"
 fi
-
-
