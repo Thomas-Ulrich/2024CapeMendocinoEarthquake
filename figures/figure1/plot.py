@@ -17,9 +17,9 @@ kinematic_inv_stations = pd.read_csv('./kinematic_inv_stations.csv')
 import pygmt
 
 pygmt.makecpt(
-    cmap="viridis",   
-    series=[10, 35], 
-    output="cmt.cpt" 
+    cmap="viridis",
+    series=[10, 35],
+    output="cmt.cpt"
 )
 
 
@@ -79,7 +79,7 @@ event_data = pd.DataFrame({
 event_data = pd.concat([event_data, focal_df], axis=1)
 
 # Plot the beachball using GCMT convention
-fig.meca(spec=event_data, scale="2c", offset=True) 
+fig.meca(spec=event_data, scale="2c", offset=True)
 fig.text(x=-126.0, y=40.57, text='1994@[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='0/-0.5c')
 fig.text(x=-125.35, y=40.374, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='1.5c/-0.7c')
 

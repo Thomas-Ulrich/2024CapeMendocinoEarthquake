@@ -20,17 +20,6 @@ repos:
       name: '[YAML] check'
       args: [--unsafe]
 
-  - repo: https://github.com/psf/black
-    rev: 22.10.0
-    hooks:
-      - id: black
-        language_version: python
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.3.0
-    hooks:
-    - id: flake8
-
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.18.1
     hooks:
@@ -50,3 +39,11 @@ repos:
       name: '[GENERIC] newline eof'
     - id: trailing-whitespace
       name: '[GENERIC] remove trailing whitespace'
+
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.12.0-2
+    hooks:
+      - id: shfmt
+        name: '[BASH] format shell scripts'
+        args: ['-i', '2', '-ci', '-w']
+        files: '\.sh$'
