@@ -7,32 +7,41 @@ This guide outlines the steps for running the dynamic rupture workflow to
 
 ## 1. Clone the Workflow Repository
 
-Clone the `rapid-earthquake-dynamics` repository at version `v0.1.1`:
+Clone the `rapid-earthquake-dynamics` repository:
 
 ```bash
-git clone --recursive --branch v0.1.1 \
+git clone --recursive --branch v0.4.0 \
  https://github.com/Thomas-Ulrich/rapid-earthquake-dynamics
+pip install -e rapid-earthquake-dynamics
 ```
 
-## 2. Prepare the Earthquake Scenario
+## 2. Prepare the Velocity Model
+
+```bash
+bash inversions/get_data_inversion.sh
+```
+
+and then copy `casc16_ASAGI.nc` to the `custom_setup_files` folder.
+
+## 3. Prepare the Earthquake Scenario
 
 Run the setup script to retrieve earthquake information and generate the
  files needed to construct an ensemble of dynamic rupture models from a
 kinematic finite fault model:
 
 ```bash
-../rapid-earthquake-dynamics/step1_model_setup.py --config input_config.yaml
+redyn init --config input_config.yaml
 ```
 
 This will create a directory containing all necessary input files.
 
-## 3. Run the Workflow on HPC (e.g., superNG)
+## 4. Run the Workflow on HPC (e.g., superNG)
 
 Copy the generated folder to your HPC system (e.g., superNG) and execute the
  workflow using:
 
 ```bash
-../rapid-earthquake-dynamics/step2_NG.sh
+../rapid-earthquake-dynamics/run_full_workflow_supercomputer.sh
 ```
 
 This script will launch a sequence of srun jobs to:

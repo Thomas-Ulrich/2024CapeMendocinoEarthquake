@@ -1,10 +1,10 @@
 CFS_code: CFS_code_block.lua
 config: null
 custom_setup_files:
-- material.yaml
-- casc16_ASAGI.nc
-- fault_tags.yaml
-- observations
+- custom_setup_files/material.yaml
+- custom_setup_files/casc16_ASAGI.nc
+- custom_setup_files/fault_tags.yaml
+- custom_setup_files/observations
 event_id: nc75095651
 fault_mesh_size: auto
 finite_fault_model: Solucion_strike_98.param
