@@ -24,7 +24,7 @@ cat = pd.read_csv('./aftershocks.csv')
 cat['time'] = pd.to_datetime(cat['time'])
 cat = cat[cat.time > pd.to_datetime('2024-12-05T18:44:21')]
 
-       
+
 cat_on_fault = pd.read_csv('./aftershocks_on_fault.csv')
 cat_on_fault['time'] = pd.to_datetime(cat_on_fault['time'])
 cat_on_fault = cat_on_fault[cat_on_fault.time > pd.to_datetime('2024-12-05T18:44:21')]
@@ -70,7 +70,7 @@ fig.coast(
     shorelines='1p,black',
     land = 'lightgray',
     water='lightblue'
-    
+
 )
 fig.plot(
     data='./faults.gmt',
@@ -141,7 +141,7 @@ if plot_kinematic:
         line=True,
         vector="0.4c+e+gpink",
     )
-    fig.text(x=-125.25, y=40.84, text='Kinematic inversion', font="10p", offset='3.5c/0.0c') 
+    fig.text(x=-125.25, y=40.84, text='Kinematic inversion', font="10p", offset='3.5c/0.0c')
 
 fig.velo(
     data=[[-125.25, 40.9, size, 0]],
@@ -152,7 +152,7 @@ fig.velo(
 )
 
 fig.text(x=-125.25, y=40.9, text='3 cm', font="10p", offset='0.8c/0.5c')
-fig.text(x=-125.25, y=40.87, text='Dynamic rupture model', font="10p", offset='3.8c/0.0c') 
+fig.text(x=-125.25, y=40.87, text='Dynamic rupture model', font="10p", offset='3.8c/0.0c')
 fig.text(x=-125.25, y=40.9, text='Data', font="10p", offset='2.35c/0.0c')
 
 fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")

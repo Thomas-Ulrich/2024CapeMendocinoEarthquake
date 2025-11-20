@@ -10,4 +10,3 @@ with open(cmt_file, 'w') as file:
     file.write(content)
 
 print(f"Modified file saved as {cmt_file}")
-
