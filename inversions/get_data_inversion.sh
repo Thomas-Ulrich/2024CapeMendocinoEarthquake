@@ -43,7 +43,7 @@ fi
 if [[ "$download_teleseismic" == "y" || "$download_teleseismic" == "Y" ]]; then
   echo "Downloading Teleseismic data..."
   mkdir -p data/Teleseismic_Data
-  wasp manage acquire data/Teleseismic_Data data/cmtsolution -t body
+  ffm manage acquire data/Teleseismic_Data data/cmtsolution -t body
 else
   echo "Skipping Teleseismic download."
 fi
