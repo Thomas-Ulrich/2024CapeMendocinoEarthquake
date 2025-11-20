@@ -48,4 +48,3 @@ fn = "depth_vs_sigma_n_cohesion.pdf"
 plt.savefig(fn)
 print(f"done writing {fn}")
 plt.show()
-

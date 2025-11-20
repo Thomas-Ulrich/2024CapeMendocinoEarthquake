@@ -77,5 +77,3 @@ df_out = df_out.rename(columns={"E_syn": "E", "N_syn": "N", "Up_syn": "Up"})
 df_out = df_out.dropna()
 
 df_out.to_csv("gnss_data_preferred_DR.csv", index=False)
-
-

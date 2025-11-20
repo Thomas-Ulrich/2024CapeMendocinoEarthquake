@@ -4,5 +4,5 @@ python ~/TuSeisSolScripts/displayh5vtk/generate_vtk_grid.py --lon " -125" " -122
 mv grid.vtk grid_larger.vtk
 python ~/TuSeisSolScripts/displayh5vtk/generate_vtk_grid.py --lon " -125" " -123" --lat 39 44 --dx 1 --proj "$projection"
 ~/SeisSol/SeisSol/postprocessing/visualization/tools/CreateVtkCoastLineFromGmt.py --lon " -128" " -122" --lat 37 40.5 --proj EPSG:32610 --resolution f --filter 1000
-mv  CoastLine.vtk CoastLine_long_EPSG_32610.vtk
+mv CoastLine.vtk CoastLine_long_EPSG_32610.vtk
 ~/SeisSol/SeisSol/postprocessing/visualization/tools/CreateVtkCoastLineFromGmt.py --lon " -128" " -122" --lat 39 44 --proj "$projection" --resolution f --filter 1000
