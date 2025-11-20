@@ -18,6 +18,7 @@ repos:
       name: '[GENERIC] detect illegal Windows file names'
     - id: check-yaml
       name: '[YAML] check'
+      args: [--unsafe]
 
   - repo: https://github.com/psf/black
     rev: 22.10.0

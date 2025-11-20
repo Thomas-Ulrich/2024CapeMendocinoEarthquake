@@ -21,9 +21,9 @@ suffix=gps
 if [[ "$rerun_gps" == "y" ]]; then
    #we first run a auto inversion
    ffm model run $(pwd) auto_model -g data/cmtsolution -t gnss -d data/Static_Data/
-
-   cp 20241205184419/ffm.0/NP1/ ${myfolder}_$suffix -r
-   rm -r 20241205184419
+   auto_folder=$(scripts/compile_folder_name_auto_inversion.py)
+   cp $auto_folder/ffm.0/NP1/ ${myfolder}_$suffix -r
+   rm -r $auto_folder
 
    #python scripts/prepare_velocity_model_canvas.py $lon
    python scripts/prepare_velocity_model.py $lon

@@ -24,6 +24,7 @@ if [[ "$download_cmt" == "y" || "$download_cmt" == "Y" ]]; then
     echo "Downloading CMT data..."
     mkdir -p data
     curl https://ds.iris.edu/spudservice/momenttensor/22929936/cmtsolution -o data/cmtsolution
+    cp data/cmtsolution data/cmtsolution_ini
     scripts/modify_depth_in_cmtsolution.py
 else
     echo "Skipping CMT download."

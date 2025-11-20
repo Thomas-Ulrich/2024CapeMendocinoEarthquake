@@ -4,7 +4,8 @@ custom_setup_files:
 - custom_setup_files/material.yaml
 - custom_setup_files/casc16_ASAGI.nc
 - custom_setup_files/fault_tags.yaml
-- custom_setup_files/observations
+- custom_setup_files/regional_observations
+- custom_setup_files/global_observations
 event_id: nc75095651
 fault_mesh_size: auto
 finite_fault_model: Solucion_strike_98.param
@@ -13,5 +14,6 @@ mu_delta_min: 0.02
 projection: +proj=tmerc +datum=WGS84 +k=0.9996 +lon_0=-125.02 +lat_0=40.37
 reference_moment_rate_function: STF.txt
 regional_seismic_stations: NC.KRP,BK.SBAR,BK.THOM,BK.DMOR,NC.KMPB,BK.HUNT,BK.ETSL,BK.HALS,BK.MNDO
+teleseismic_stations: IU.DWPF,IU.FUNA,IU.PET,IU.SSPA,IU.YAK,II.ALE,IU.SDV,IU.MACI,IU.MIDW,II.RPN,IU.RAO,IU.KONO,IU.AFI,G.PPTF
 tmax: null
 velocity_model: vel_model_axitra_fmt.txt
