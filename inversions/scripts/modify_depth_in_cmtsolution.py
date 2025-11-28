@@ -9,8 +9,9 @@ content = (
     .replace(" 0.6", "10.0")
     .replace("PDEQ", "PDE")
     .replace("40.3700", "40.3600")
+    .replace("125.0300", "125.0220")
+    .replace("19.80", "20.00")
 )
-# .replace("19.80", "24.00")
 
 with open(cmt_file, "w") as file:
     file.write(content)

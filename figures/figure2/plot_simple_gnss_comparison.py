@@ -159,7 +159,6 @@ fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 
 
 fig.basemap(map_scale="n0.07/0.81+w10k+f+u")
-fig.text(position='TL', no_clip=True, text='(c)', font='12p,Helvetica,black', offset='-0.8c/0.4c')
 
 
 
