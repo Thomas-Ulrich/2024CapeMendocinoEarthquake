@@ -24,6 +24,7 @@ if [[ "$download_cmt" == "y" || "$download_cmt" == "Y" ]]; then
   echo "Downloading CMT data..."
   mkdir -p data
   curl https://ds.iris.edu/spudservice/momenttensor/22929936/cmtsolution -o data/cmtsolution
+  cp data/cmtsolution data/cmtsolution_ini
   scripts/modify_depth_in_cmtsolution.py
 else
   echo "Skipping CMT download."
@@ -43,7 +44,7 @@ fi
 if [[ "$download_teleseismic" == "y" || "$download_teleseismic" == "Y" ]]; then
   echo "Downloading Teleseismic data..."
   mkdir -p data/Teleseismic_Data
-  wasp manage acquire data/Teleseismic_Data data/cmtsolution -t body
+  ffm manage acquire data/Teleseismic_Data data/cmtsolution -t body
 else
   echo "Skipping Teleseismic download."
 fi

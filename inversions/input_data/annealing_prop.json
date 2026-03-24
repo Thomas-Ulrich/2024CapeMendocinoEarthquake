@@ -1,5 +1,5 @@
 {
-    "cooling_rate": 0.97,
+    "cooling_rate": 0.95,
     "initial_temperature": 0.01,
     "iterations": 250,
     "max_source_dur": 30,

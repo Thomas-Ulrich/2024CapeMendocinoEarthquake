@@ -13,9 +13,16 @@ fig, ax = plt.subplots()
 # Create two Line2D objects just for the legend
 from matplotlib.lines import Line2D
 
+"""
 legend_elements = [
     Line2D([0], [0], color='red', lw=2, label='CCVMv1.6 velocity model'),
     Line2D([0], [0], color='blue', lw=2, label='default velocity model')
+]
+"""
+
+legend_elements = [
+    Line2D([0], [0], color='red', lw=2, label='baseline inversion'),
+    Line2D([0], [0], color='blue', lw=2, label='inversion with Cascadia')
 ]
 
 # Hide axes
