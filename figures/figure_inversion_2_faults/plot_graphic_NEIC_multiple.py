@@ -46,7 +46,8 @@ from ffm import get_outputs, load_ffm_model
 from ffm.plot_maps_NEIC import plot_map, set_map_cartopy
 from ffm.static2fsp import static_to_fsp
 from ffm.static2srf import static_to_srf
-#from ffm.waveform_plots_NEIC import plot_waveform_fits
+
+# from ffm.waveform_plots_NEIC import plot_waveform_fits
 from ffm.waveform_plots_NEIC import add_metadata
 
 """
@@ -76,7 +77,6 @@ plt.rc("axes", labelsize=12)
 plt.rc("xtick", labelsize=12)
 plt.rc("ytick", labelsize=12)
 plt.rc("font", size=12)
-
 
 
 def plot_waveforms(
@@ -217,7 +217,6 @@ def plot_waveforms(
     return axes
 
 
-
 def plot_waveform_fits(
     files: List[dict],
     components: list,
@@ -265,7 +264,6 @@ def plot_waveform_fits(
         )
         additional_syn_waveforms = [file["synthetic"] for file in additional_files]
 
-
     sampling = [file["dt"] for file in files]
     names = [file["name"] for file in files]
     azimuths = [file["azimuth"] for file in files]
@@ -289,14 +287,30 @@ def plot_waveform_fits(
     ]
 
     if additional_files:
-        shift_additional_file = [
-            f1["start_signal"] - f2["start_signal"]
-            for f1, f2 in zip(files, additional_files)
-        ]
-        # syn_times need to be udpate to account for potential different shift match
-        additional_syn_times = [
-            arr - dt * shift_additional_file[k] for k, arr in enumerate(syn_times)
-        ]
+        # Create a lookup map: key is (station_name, component)
+        add_map = {(f["name"], f["component"]): f for f in additional_files}
+
+        matched_additional_waveforms = []
+        matched_additional_times = []
+
+        for i, f1 in enumerate(files):
+            key = (f1["name"], f1["component"])
+            f2 = add_map.get(key)
+
+            if f2:
+                # Calculate shift and time for the MATCHING station
+                shift = f1["start_signal"] - f2["start_signal"]
+                dt = f1["dt"]
+
+                matched_additional_waveforms.append(f2["synthetic"])
+                matched_additional_times.append(syn_times[i] - dt * shift)
+            else:
+                # Handle cases where the additional file doesn't have this station
+                matched_additional_waveforms.append(np.array([]))
+                matched_additional_times.append(np.array([]))
+
+        additional_syn_waveforms = matched_additional_waveforms
+        additional_syn_times = matched_additional_times
 
     numrows_phase = len(files) // 3 + 1
     fig, axes = plt.subplots(
@@ -340,7 +354,6 @@ def plot_waveform_fits(
                 custom="syn",
                 yrel_annotation_max=0.8,
             )
-
 
         dict = {
             "weights": weights,
@@ -386,7 +399,6 @@ def plot_waveform_fits(
                 yrel_annotation_max=0.8,
             )
 
-
         dict = {
             "weights": weights,
             "azimuths": azimuths,
@@ -419,8 +431,6 @@ def plot_waveform_fits(
     plt.savefig(plot_directory / (plot_name + ".ps"))
     plt.close()
     return
-
-
 
 
 def retrieve_addition_traces(directory, data_type, stations=None):
@@ -475,20 +485,22 @@ def plot_misfit(
         traces_info = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_body.txt", directory=directory
         )
-
         if stations:
             traces_info = [file for file in traces_info if file["name"] in stations]
 
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "body", stations)
-            if len(directories)>1
+            if len(directories) > 1
             else []
         )
 
         values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
-                traces_info, components, "body", plot_directory=directory,
+                traces_info,
+                components,
+                "body",
+                plot_directory=directory,
                 additional_files=additional_traces_info,
             )
     if "surf" in used_data_type:
@@ -507,14 +519,17 @@ def plot_misfit(
 
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "surf", stations)
-            if len(directories)>1
+            if len(directories) > 1
             else []
         )
 
         values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
-                traces_info, components, "surf", plot_directory=directory,
+                traces_info,
+                components,
+                "surf",
+                plot_directory=directory,
                 additional_files=additional_traces_info,
             )
     if "strong" in used_data_type:
@@ -533,7 +548,7 @@ def plot_misfit(
 
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "strong", stations)
-            if len(directories)>1
+            if len(directories) > 1
             else []
         )
 
@@ -561,7 +576,6 @@ def plot_misfit(
             traces_info, values, "cgnss", start_margin=10, plot_directory=directory
         )
     return
-
 
 
 if __name__ == "__main__":
