@@ -3,96 +3,168 @@ set -euo pipefail
 
 #lon=124.5
 lon=124.75
-myfolder=re98${lon}
+#lon=125
+myfolder=$1
 
 # Prompt for user input
-echo "Do you want to rerun the gps (y/n)"
-read -r rerun_gps
+echo "Do you want to rerun the gnss (y/n)"
+read -r rerun_gnss
 
-echo "Do you want to rerun the gps-teleseismic inversion (y/n)"
-read -r rerun_gps_tele
+echo "Do you want to rerun the gnss-teleseismic inversion (y/n)"
+read -r rerun_gnss_tele
 
-echo "Do you want to rerun the gps-teleseismic-strong motion inversion (y/n)"
-read -r rerun_gps_tele_strong
+echo "Do you want to rerun the gnss-teleseismic-strong motion inversion (y/n)"
+read -r rerun_gnss_tele_strong
 
-suffix=gps
-if [[ "$rerun_gps" == "y" ]]; then
+copy_results_to_plots_and_rename() {
+  # $1 = name of the destination folder (e.g., plots_gnss_tele_shift_match)
+  if [ -z "$1" ]; then
+    echo "Usage: copy_and_move <destination_folder>"
+    return 1
+  fi
+  dest="$1"
+  mv Solution.txt plots/Solution.param
+  mv modelling_summary.txt plots
+  # move misfit_details.txt only if it exists
+  if [ -f misfit_details.txt ]; then
+    mv misfit_details.txt plots
+  fi
+  # Step 2: rename/move 'plots' to the destination folder name
+  mv plots ../$dest
+}
+
+mkdir -p $myfolder && cd $myfolder
+
+suffix=gnss
+if [[ "$rerun_gnss" == "y" ]]; then
   #we first run a auto inversion
-  wasp model run $(pwd) auto_model -g data/cmtsolution -t gps -d data/Static_Data/
+  ln -sfn ../data data
+  ln -sfn ../scripts scripts
+  ln -sfn ../input_data input_data
+  ln -sfn ../input_data_gs input_data_gs
+  ln -sfn ../input_data_varyingdip input_data_varyingdip
+  ffm model run $(pwd) auto_model -g data/cmtsolution -t gnss -d data/Static_Data/
 
-  cp 20241205184419/ffm.0/NP1/ ${myfolder}_$suffix -r
-  rm -r 20241205184419
+  auto_folder=$(../scripts/compile_folder_name_auto_inversion.py)
+  cp $auto_folder/ffm.0/NP1/ $suffix -r
+  rm -r $auto_folder
 
-  #python scripts/prepare_velocity_model_canvas.py $lon
-  python scripts/prepare_velocity_model.py $lon
-  cp input_data/segments_data.json ${myfolder}_$suffix
-  cp input_data/annealing_prop.json ${myfolder}_$suffix
-  cp data/vel_model.txt ${myfolder}_$suffix
+  cp input_data/annealing_prop.json $suffix
 
-  cd ${myfolder}_${suffix}
-  #wasp model run $(pwd) manual_model_add_data
-  wasp manage velmodel-to-json $(pwd) vel_model.txt
-  wasp manage update-inputs $(pwd) -p -m -a
-  wasp model run $(pwd) manual_model_add_data
-  cp Solucion.txt plots
-  cp modelling_summary.txt plots
+  if [[ $myfolder == newEW* ]]; then
+    echo "using 2 segment model (EW)"
+    # your commands here
+    cp input_data_gs/segments_data_2segments_$myfolder.json $suffix/segments_data.json
+    #cp input_data/segments_data_2segments_EW.json $suffix/segments_data.json
+    cp input_data/model_space_2segments_EW.json $suffix/model_space.json
+  elif [[ $myfolder == LL* ]]; then
+    echo "using Li and Lay 2 segment model"
+    # your commands here
+    cp input_data/segments_data_2segments.json $suffix/segments_data.json
+    cp input_data/model_space_2segments.json $suffix/model_space.json
+    cp input_data/tensor_info_LL.json $suffix/tensor_info.json
+  elif [[ $myfolder == splay* || $myfolder == S70_N85* ]]; then
+    echo "using custom 2 faults model"
+    # your commands here
+    #python scripts/set_moment_weight.py $suffix/annealing_prop.json 0.0
+    cp input_data/segments_data_2segments_$myfolder.json $suffix/segments_data.json
+    echo "using input_data/model_space_2segments_700.json"
+    cp input_data/model_space_2segments_700.json $suffix/model_space.json
+    cp input_data/tensor_info_lower.json $suffix/tensor_info.json
+  elif [[ $myfolder == focmec* ]]; then
+    echo "using Li and Lay 2 segment model"
+    # your commands here
+    cp input_data/segments_data_2segments_focmec.json $suffix/segments_data.json
+    cp input_data/model_space_2segments_focmec.json $suffix/model_space.json
+  elif [[ $myfolder == newdip* ]]; then
+    cp input_data_varyingdip/segments_data_$myfolder.json $suffix/segments_data.json
+    cp "input_data/model_space_vardip.json" "$suffix/model_space.json"
+  elif [[ $myfolder == dip* ]]; then
+    dip_value="${myfolder#dip}"  # remove leading 'dip'
+    dip_value="${dip_value%%_*}" # keep only characters before first '_'
+    echo "using dip $dip_value fault"
+    cp "input_data/segments_data_dip${dip_value}.json" "$suffix/segments_data.json"
+    cp "input_data/model_space_vardip.json" "$suffix/model_space.json"
+  elif [[ $myfolder == re98* ]]; then
+    echo "using strike 98 base fault model"
+    cp input_data/segments_data.json ${myfolder}_$suffix
+    cp input_data/model_space_vardip.json $suffix/model_space.json
+  elif [[ $myfolder == with_cascadia* ]]; then
+    cp input_data/segments_data_with_cascadia.json ${myfolder}_$suffix/segments_data.json
+    cp input_data/model_space_with_cascadia.json ${myfolder}_$suffix/model_space.json
+  else
+    echo "$myfolder structure not understood"
+    exit -1
+  fi
+
+  if [[ "$myfolder" == *usgs* ]]; then
+    #only if usgs in the myfolder name will the usgs default velocity model be used
+    cd ${suffix}
+  else
+    python scripts/prepare_velocity_model.py $lon
+    cp data/vel_model.txt $suffix
+    cd ${suffix}
+    ffm manage velmodel-to-json $(pwd) vel_model.txt
+  fi
+
+  ffm manage update-inputs $(pwd) -p -m -a
+  ffm model run $(pwd) manual_model_add_data
+  copy_results_to_plots_and_rename plots_gnss
   cd ..
 fi
 
-if [[ "$rerun_gps_tele" == "y" ]]; then
-  cp -r ${myfolder}_${suffix} ${myfolder}_gps_tele
-  suffix=gps_tele
-  cd ${myfolder}_${suffix}
+if [[ "$rerun_gnss_tele" == "y" ]]; then
+  cp -r ${suffix} gnss_tele
+  suffix=gnss_tele
+  cd ${suffix}
 
   echo "starting inv with teleseismics"
-  wasp model run $(pwd) manual_model_add_data -t body -t surf -d ../data/Teleseismic_Data/
-  wasp manage modify-dicts $(pwd) downweight surf -sc "DWPF:BHZ,SH"
-  wasp manage modify-dicts $(pwd) downweight surf -sc "MIDW:SH"
-  wasp manage modify-dicts $(pwd) downweight surf -sc "HRV:SH"
-  wasp manage update-inputs $(pwd) -t surf
+  ffm model run $(pwd) manual_model_add_data -t body -t surf -d ../data/Teleseismic_Data/
+  ffm manage modify-dicts $(pwd) downweight surf -sc "KBS:BHZ"
+  ffm manage modify-dicts $(pwd) downweight surf -sc "KEV:BHZ"
+  ffm manage modify-dicts $(pwd) downweight surf -sc "MIDW:BHT"
+  ffm manage modify-dicts $(pwd) downweight surf -sc "MSVF:BHT"
+  ffm manage modify-dicts $(pwd) downweight surf -sc "MA2:BHT"
+  ffm manage update-inputs $(pwd) -t surf
 
-  cp Solucion.txt plots
-  cp modelling_summary.txt plots
-  mv plots plots_gps_tele
+  copy_results_to_plots_and_rename plots_gnss_tele
 
-  wasp process shift-match $(pwd) body -o auto
-  wasp process shift-match $(pwd) surf -o auto
-  wasp process remove-baseline $(pwd)
-  wasp manage update-inputs $(pwd) -t body -t surf
+  ffm process shift-match $(pwd) body -o auto
+  ffm process shift-match $(pwd) surf -o auto
+  ffm process remove-baseline $(pwd)
+  ffm manage update-inputs $(pwd) -t body -t surf
   echo "starting inv with teleseismics after shift-match"
-  wasp model run $(pwd) manual_model_add_data
-  cp Solucion.txt plots
-  cp modelling_summary.txt plots
-  mv plots plots_gps_tele_shift_match
+  ffm model run $(pwd) manual_model_add_data
+  copy_results_to_plots_and_rename plots_gnss_tele_shift_match
   cd ..
 fi
 
-if [[ "$rerun_gps_tele_strong" == "y" ]]; then
-  suffix=gps_tele
-  cp -r ${myfolder}_$suffix ${myfolder}_gps_tele_sm
-  suffix=gps_tele_sm
-  cd ${myfolder}_${suffix}
-  wasp model run $(pwd) manual_model_add_data -t strong -d ../data/StrongMotion_Data/
-  cp Solucion.txt plots
-  mv plots plots_gps_tele_sm
-  echo "done running inversion with strong motion"
+if [[ "$rerun_gnss_tele_strong" == "y" ]]; then
+  suffix=gnss_tele
+  cp -r $suffix gnss_tele_sm
+  suffix=gnss_tele_sm
+  cd ${suffix}
 
-  ../../submodules/seismic-waveform-factory/scripts/modify_wasp_strong_motion_waves.py ../input_data/waveforms_config.ini
-  wasp model run $(pwd) manual_model_add_data
-  cp Solucion.txt plots
-  cp modelling_summary.txt plots
-  mv plots plots_gps_tele_sm_shorter
+  cp ../input_data/annealing_prop_1it.json annealing_prop.json
+  ffm manage update-inputs $(pwd) -a
+  ffm model run $(pwd) manual_model_add_data -t strong -d ../data/StrongMotion_Data/
+  cp ../input_data/annealing_prop.json .
+  ffm manage update-inputs $(pwd) -a
+  copy_results_to_plots_and_rename plots_gnss_tele_sm
+  echo "done running inversion with strong motion"
+  ../scripts/modify_wasp_strong_motion_waves.py 10
+  ffm model run $(pwd) manual_model_add_data
+  copy_results_to_plots_and_rename plots_gnss_tele_sm_shorter
   cd ..
   echo "done running inversion with strong motion (shorter)"
 
-  suffix=gps_tele_sm
-  cp -r ${myfolder}_${suffix} ${myfolder}_gps_tl_sm2
-  suffix=gps_tl_sm2
-  cd ${myfolder}_${suffix}
-  wasp process shift-match $(pwd) strong -o auto
-  wasp model run $(pwd) manual_model_add_data
-  cp Solucion.txt plots
-  cp modelling_summary.txt plots
+  cp -r ${suffix} gnss_tl_sm2
+  suffix=gnss_tl_sm2
+  cd ${suffix}
+  ffm process shift-match $(pwd) strong -o auto
+  ffm model run $(pwd) manual_model_add_data
+  copy_results_to_plots_and_rename plots_gnss_tele_sm_shorter_shma
   cd ..
   echo "done running inversion with strong motion (shorter + shift-match)"
 fi
+cd ..

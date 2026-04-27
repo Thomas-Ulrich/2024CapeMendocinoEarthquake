@@ -113,6 +113,9 @@ lat = np.append(lat, lat[0])
 fig.plot(x=lon, y=lat, fill="blue@60", close=True)
 
 
+# adding a x where the 1D velocity model is evaluated
+fig.plot(x=-124.75, y=40.5, style='x0.5c', fill='yellow', pen='1.0p,black')
+
 fig.basemap(map_scale="n0.8/0.95+w100k+f+u")
 
 #Add the color bar for depth
@@ -191,4 +194,6 @@ fig.plot(x=t_stations.lon, y=t_stations.lat, style='t0.3c', fill='black')
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['body'])]
 fig.plot(x=t_stations.lon, y=t_stations.lat, style='s0.2c', fill='cyan')
 fig.plot(x=event_data.longitude, y=event_data.latitude, style='a0.5c', fill='yellow', pen='0.2p,black')
-fig.savefig('./fig1.pdf')
+fname = "fig1.pdf"
+fig.savefig('fig1.pdf')
+print(f"done writing {fname}")

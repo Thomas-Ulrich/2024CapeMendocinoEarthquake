@@ -12,7 +12,7 @@ import os
 import pathlib
 from datetime import datetime
 from shutil import move
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union, Literal
 
 import cartopy.crs as ccrs  # type: ignore
 import cartopy.feature as cf  # type: ignore
@@ -37,19 +37,40 @@ from scipy.interpolate import griddata  # type: ignore
 #
 # local modules
 #
-import wasp.fault_plane as pf
-import wasp.plane_management as pl_mng
-import wasp.seismic_tensor as tensor
-import wasp.shakemap_tools as shakemap
-import wasp.velocity_models as mv
-from wasp import get_outputs, load_ffm_model
-from wasp.plot_maps_NEIC import plot_map, set_map_cartopy
-from wasp.static2fsp import static_to_fsp
-from wasp.static2srf import static_to_srf
+import ffm.fault_plane as pf
+import ffm.plane_management as pl_mng
+import ffm.seismic_tensor as tensor
+import ffm.shakemap_tools as shakemap
+import ffm.velocity_models as mv
+from ffm import get_outputs, load_ffm_model
+from ffm.plot_maps_NEIC import plot_map, set_map_cartopy
+from ffm.static2fsp import static_to_fsp
+from ffm.static2srf import static_to_srf
 
-# from wasp.waveform_plots_NEIC import plot_waveform_fits
-from wasp.waveform_plots_NEIC import add_metadata
-from typing import List, Literal, Optional, Union
+# from ffm.waveform_plots_NEIC import plot_waveform_fits
+from ffm.waveform_plots_NEIC import add_metadata
+
+"""
+Set colorbar for slip
+"""
+"""
+rm = 100  # amount of lines to remove on black end of magma_r
+ad = 50  # how much at the zero end should be *just* white before transitioning to meet colors
+magma_cpt = colormaps.get_cmap("magma_r")  # start with magma_r
+white_bit = np.array([255 / 256, 250 / 256, 250 / 256, 1])  # create array of white
+slip_cpt = magma_cpt(np.linspace(0, 1, 512))  # initialize slip_cpt
+slip_cpt[rm:, :] = slip_cpt[0:-rm, :]  # move beginning up to remove black end
+r_s = np.linspace(
+    white_bit[0], slip_cpt[rm][0], rm - ad
+)  # gradient from white to beginning of new magma
+g_s = np.linspace(white_bit[1], slip_cpt[rm][1], rm - ad)
+b_s = np.linspace(white_bit[2], slip_cpt[rm][2], rm - ad)
+slip_cpt[ad:rm, :][:, 0] = r_s
+slip_cpt[ad:rm, :][:, 1] = g_s
+slip_cpt[ad:rm, :][:, 2] = b_s
+slip_cpt[:ad, :] = white_bit
+slipcpt = ListedColormap(slip_cpt)
+"""
 
 plt.rc("axes", titlesize=14)
 plt.rc("axes", labelsize=12)
@@ -127,7 +148,7 @@ def plot_waveforms(
                 )
                 ax.hlines(0, -350, np.max(time), "k", lw=1)
                 ax.set_xlim((-350, np.max(time)))
-            elif type_str == "cgps" or type_str == "strong":
+            elif type_str == "cgnss" or type_str == "strong":
                 min_wval = np.min(waveform)
                 max_wval = np.max(waveform)
                 if max_wval > abs(min_wval):
@@ -149,38 +170,6 @@ def plot_waveforms(
                 ax.hlines(0, -15, np.max(time), "k", lw=1)
                 ax.set_xlim((-15, np.max(time)))
             min_time, max_time = ax.get_xlim()
-            if type_str == "body" and comp == "BHZ":
-                ax.text(
-                    1.1 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "P",
-                    ha="right",
-                    va="bottom",
-                )
-            if type_str == "body" and comp == "SH":
-                ax.text(
-                    1.1 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "SH",
-                    ha="right",
-                    va="bottom",
-                )
-            if type_str == "surf" and comp == "BHZ":
-                ax.text(
-                    1.2 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "Z",
-                    ha="right",
-                    va="bottom",
-                )
-            if type_str == "surf" and comp == "SH":
-                ax.text(
-                    1.2 * min_time,
-                    0.2 * max(abs(min_val), max_val),
-                    "T",
-                    ha="right",
-                    va="bottom",
-                )
         if custom == "syn":
             max_val = np.maximum(abs(min(waveform)), max(waveform))
             tmin, tmax = ax.get_xlim()
@@ -203,7 +192,7 @@ def plot_waveforms(
                     va="center",
                     color=color,
                 )
-            elif type_str == "cgps" or type_str == "strong":
+            elif type_str == "cgnss" or type_str == "strong":
                 ax.text(
                     tmax,
                     yrel_annotation_max * ymin,
@@ -219,7 +208,7 @@ def plot_waveforms(
         elif type_str == "surf":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(500))
             ax.yaxis.set_major_locator(ticker.NullLocator())
-        elif type_str == "cgps" or type_str == "strong":
+        elif type_str == "cgnss" or type_str == "strong":
             ax.xaxis.set_major_locator(ticker.MultipleLocator(40))
             ax.yaxis.get_major_locator().set_params(integer=True)  # type:ignore
         if nPlot > len(weights) - 3:
@@ -253,7 +242,7 @@ def plot_waveform_fits(
     if type_str == "body" or type_str == "surf":
         files = [file for file in files if file["component"] in components]
         print("Creating Waveform Fit Plot: " + str(type_str) + " " + str(components[0]))
-    if type_str == "cgps" or type_str == "strong":
+    if type_str == "cgnss" or type_str == "strong":
         files = [file for file in files]
         print("Creating Waveform Fit Plot: " + str(type_str))
     if not len(files):
@@ -263,6 +252,7 @@ def plot_waveform_fits(
         )
         return
     files = sorted(files, key=lambda k: (k["azimuth"], k["component"]))
+
     if additional_files:
         if type_str == "body" or type_str == "surf":
             additional_files = [
@@ -297,14 +287,30 @@ def plot_waveform_fits(
     ]
 
     if additional_files:
-        shift_additional_file = [
-            f1["start_signal"] - f2["start_signal"]
-            for f1, f2 in zip(files, additional_files)
-        ]
-        # syn_times need to be udpate to account for potential different shift match
-        additional_syn_times = [
-            arr - dt * shift_additional_file[k] for k, arr in enumerate(syn_times)
-        ]
+        # Create a lookup map: key is (station_name, component)
+        add_map = {(f["name"], f["component"]): f for f in additional_files}
+
+        matched_additional_waveforms = []
+        matched_additional_times = []
+
+        for i, f1 in enumerate(files):
+            key = (f1["name"], f1["component"])
+            f2 = add_map.get(key)
+
+            if f2:
+                # Calculate shift and time for the MATCHING station
+                shift = f1["start_signal"] - f2["start_signal"]
+                dt = f1["dt"]
+
+                matched_additional_waveforms.append(f2["synthetic"])
+                matched_additional_times.append(syn_times[i] - dt * shift)
+            else:
+                # Handle cases where the additional file doesn't have this station
+                matched_additional_waveforms.append(np.array([]))
+                matched_additional_times.append(np.array([]))
+
+        additional_syn_waveforms = matched_additional_waveforms
+        additional_syn_times = matched_additional_times
 
     numrows_phase = len(files) // 3 + 1
     fig, axes = plt.subplots(
@@ -348,6 +354,7 @@ def plot_waveform_fits(
                 custom="syn",
                 yrel_annotation_max=0.8,
             )
+
         dict = {
             "weights": weights,
             "azimuths": azimuths,
@@ -356,7 +363,7 @@ def plot_waveform_fits(
             "type_str": type_str,
             "comps": comp[0],
         }
-    if type_str == "cgps" or type_str == "strong":
+    if type_str == "cgnss" or type_str == "strong":
         axes2 = plot_waveforms(
             list(axes2),
             obs_times,
@@ -378,6 +385,7 @@ def plot_waveform_fits(
             custom="syn",
             yrel_annotation_max=0.5,
         )
+
         if additional_files:
             axes2 = plot_waveforms(
                 axes2,
@@ -404,22 +412,22 @@ def plot_waveform_fits(
     if type_str == "body":
         if "BHZ" in components:
             plot_name = "P_body_waves"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "SH_body_waves"
 
     if type_str == "surf":
         if "BHZ" in components:
             plot_name = "Rayleigh_surf_waves"
-        if "SH" in components:
+        if "BHT" in components:
             plot_name = "Love_surf_waves"
 
-    if type_str == "cgps":
-        plot_name = "cGPS_waves"
+    if type_str == "cgnss":
+        plot_name = "cGNSS_waves"
 
     if type_str == "strong":
         plot_name = "strong_motion_waves"
 
-    plt.savefig(plot_directory / (plot_name + ".png"), dpi=300, bbox_inches='tight')
+    plt.savefig(plot_directory / (plot_name + ".png"), dpi=300)  # bbox_inches='tight')
     plt.savefig(plot_directory / (plot_name + ".ps"))
     plt.close()
     return
@@ -463,6 +471,7 @@ def plot_misfit(
     :type directory: Union[pathlib.Path, str], optional
     :raises FileNotFoundError: When a data type's json file is not found
     """
+    print("Creating Plot Of Misfit Of Observed And Synthetic Data...")
     directories = [pathlib.Path(directory) for directory in directories]
     directory = directories[0]
 
@@ -481,11 +490,11 @@ def plot_misfit(
 
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "body", stations)
-            if len(directories)>1
+            if len(directories) > 1
             else []
         )
 
-        values = [["BHZ"], ["SH"]]
+        values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
                 traces_info,
@@ -494,7 +503,6 @@ def plot_misfit(
                 plot_directory=directory,
                 additional_files=additional_traces_info,
             )
-
     if "surf" in used_data_type:
         if not os.path.isfile(directory / "surf_waves.json"):
             raise FileNotFoundError(
@@ -505,15 +513,17 @@ def plot_misfit(
         traces_info = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_surf.txt", margin=0, directory=directory
         )
+
         if stations:
             traces_info = [file for file in traces_info if file["name"] in stations]
 
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "surf", stations)
-            if len(directories)>1
+            if len(directories) > 1
             else []
         )
-        values = [["BHZ"], ["SH"]]
+
+        values = [["BHZ"], ["BHT"]]
         for components in values:
             plot_waveform_fits(
                 traces_info,
@@ -532,13 +542,16 @@ def plot_misfit(
         traces_info = get_outputs.get_data_dict(
             traces_info, syn_file="synthetics_strong.txt", directory=directory
         )
+
         if stations:
             traces_info = [file for file in traces_info if file["name"] in stations]
+
         additional_traces_info = (
             retrieve_addition_traces(directories[1], "strong", stations)
-            if len(directories)
+            if len(directories) > 1
             else []
         )
+
         values = [["HLZ", "HNZ"], ["HLE", "HNE"], ["HLN", "HNN"]]
         plot_waveform_fits(
             traces_info,
@@ -548,19 +561,19 @@ def plot_misfit(
             plot_directory=directory,
             additional_files=additional_traces_info,
         )
-    if "cgps" in used_data_type:
-        if not os.path.isfile(directory / "cgps_waves.json"):
+    if "cgnss" in used_data_type:
+        if not os.path.isfile(directory / "cgnss_waves.json"):
             raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), "cgps_waves.json"
+                errno.ENOENT, os.strerror(errno.ENOENT), "cgnss_waves.json"
             )
-        with open(directory / "cgps_waves.json") as t:
+        with open(directory / "cgnss_waves.json") as t:
             traces_info = json.load(t)
         traces_info = get_outputs.get_data_dict(
-            traces_info, syn_file="synthetics_cgps.txt", directory=directory
+            traces_info, syn_file="synthetics_cgnss.txt", directory=directory
         )
         values = [["LXZ", "LHZ", "LYZ"], ["LXE", "LHE", "LYE"], ["LXN", "LHN", "LYN"]]
         plot_waveform_fits(
-            traces_info, values, "cgps", start_margin=10, plot_directory=directory
+            traces_info, values, "cgnss", start_margin=10, plot_directory=directory
         )
     return
 
