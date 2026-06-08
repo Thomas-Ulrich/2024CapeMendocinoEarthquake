@@ -21,12 +21,12 @@ pygmt.makecpt(
     series=[10, 35],
     output="cmt.cpt"
 )
-
-
+fs=10
 
 
 fig = pygmt.Figure()
-pygmt.config(FORMAT_GEO_MAP='ddd.xx', MAP_FRAME_TYPE='plain')
+pygmt.config(FORMAT_GEO_MAP='ddd', MAP_FRAME_TYPE='plain')
+
 region1=[-127.5, -123.1, 39.7, 41.9]
 fig.coast(
     frame=['WSne', 'xa1f0.2', 'ya1f0.2'],
@@ -36,12 +36,13 @@ fig.coast(
     water='lightblue',
     shorelines="1/0.5p,black"
 )
+
 fig.plot(
     x=background_cat.lon,
     y=background_cat.lat,
     style="c0.05c",
     fill="darkgray",
-    label='background seismicity'
+    label='Background seismicity'
 )
 
 fig.plot(data='./output.gmt', pen='0.1p,black', close=True)
@@ -55,11 +56,11 @@ fig.meca(spec=cmt_large2.iloc[:, 3:], longitude=cmt_large2.lon, latitude=cmt_lar
 
 aki_single = {"strike": 150, "dip": 47, "rake": 30, "magnitude": 7.2}
 fig.meca(spec=aki_single, longitude=-124.229, latitude=40.335, scale="0.5+o0/-0.03", pen='0.5p', convention='aki', depth=11, cmap='cmt.cpt', event_name='1992M7.2')
-fig.text(x=-125.15, y=41.3, text='Cascadia Subduction Zone', font='12p,red', angle=-75)
-fig.text(x=-124.18, y=39.95, text='SAF', font='12p,red', angle=-75)
+fig.text(x=-125.15, y=41.3, text='Cascadia Subduction Zone', font=f'{fs}p,red', angle=-75)
+fig.text(x=-124.18, y=39.95, text='SAF', font=f'{fs}p,red', angle=-75)
 fig.plot(x=-123.95, y=39.8, style="v0.5c+ea+r+h0.1+a35", direction=([105], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-124.15, y=40.05, style="v0.5c+ea+r+h0.1+a35", direction=([285], [1.5]), pen="1p,red", fill="red")
-fig.text(x=-125.9, y=40.33, text='Mendocino Fault Zone', font='12p,red', angle=0)
+fig.text(x=-125.9, y=40.33, text='Mendocino Fault Zone', font=f'{fs}p,red', angle=0)
 
 focal_mechanism = [
     [280, 84, -179, 189, 89, -6, 4.028, 19]  # Single event
@@ -80,8 +81,8 @@ event_data = pd.concat([event_data, focal_df], axis=1)
 
 # Plot the beachball using GCMT convention
 fig.meca(spec=event_data, scale="2c", offset=True)
-fig.text(x=-126.0, y=40.57, text='1994@[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='0/-0.5c')
-fig.text(x=-125.35, y=40.374, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='10p', angle=0, offset='1.5c/-0.7c')
+fig.text(x=-126.0, y=40.57, text='1994@[M_{\\textrm{w}}@[7.0', font=f'{fs}p', angle=0, offset='0/-0.5c')
+fig.text(x=-125.35, y=40.374, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font=f'{fs}p', angle=0, offset='1.5c/-0.7c')
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-125.83, y=40.45, style="v0.5c+ea+r+h0.1+a35", direction=([180], [1.5]), pen="1p,red", fill="red")
@@ -114,7 +115,7 @@ fig.plot(x=lon, y=lat, fill="blue@60", close=True)
 
 
 # adding a x where the 1D velocity model is evaluated
-fig.plot(x=-124.75, y=40.5, style='x0.5c', fill='yellow', pen='1.0p,black')
+#fig.plot(x=-124.75, y=40.5, style='x0.5c', fill='yellow', pen='1.0p,black')
 
 fig.basemap(map_scale="n0.8/0.95+w100k+f+u")
 
@@ -123,7 +124,7 @@ with pygmt.config(FONT_LABEL='16p,Helvetica,black', FONT_ANNOT_PRIMARY='16p,Helv
     fig.colorbar(
         cmap='cmt.cpt',  # Use the same colormap as in the mec plot
         position="JBC+w6c/0.3c+o-6c/-1.8c+h",  # Position of the color bar
-        frame='af+lDepth (km)'  # Label the color bar
+        frame='a10f+lDepth (km)'  # Label the color bar
     )
 ##############################################################################################################################################################################################################################################################################
 ##############################################################################################################################################################################################################################################################################
@@ -131,7 +132,7 @@ with pygmt.config(FONT_LABEL='16p,Helvetica,black', FONT_ANNOT_PRIMARY='16p,Helv
 ##############################################################################################################################################################################################################################################################################
 fig.shift_origin(yshift='8.8c', xshift='-0.5c')
 region2=[-132, -115.1, 38, 49]
-pygmt.config(FORMAT_GEO_MAP='ddd.xx', MAP_FRAME_TYPE='plain')
+pygmt.config(FORMAT_GEO_MAP='ddd', MAP_FRAME_TYPE='plain')
 
 fig.coast(
     frame=['lrtb'],
@@ -143,13 +144,14 @@ fig.coast(
     shorelines="1/0.5p,black"
 )
 fig.plot(data='./PB2002_boundaries.gmt', pen='1p,red')
-fig.text(x=-128.0, y=39.0, text="Pacific Plate", font="6p", angle=0)
+fig.text(x=-128.0, y=39.0, text="Pacific Plate", font=f"{fs}p", angle=0)
 fig.plot(x=-128, y=39.3, style="v0.3c+ea+h0.1+a35", direction=([120], [1.0]), pen="1p", fill="black")
-fig.text(x=-128.9, y=45.5, text="JdFP", font="6p", angle=0)
+fig.text(x=-128.7, y=45.1, text="JdFP", font=f"{fs}p", angle=0)
 fig.plot(x=-127.8, y=45.5, style="v0.3c+ea+h0.1+a35", direction=([30], [0.6]), pen="1p", fill="black")
-fig.text(x=-120.5, y=43.0, text="North American Plate", font="6p", angle=0)
+fig.text(x=-119.8, y=43.7, text="North American", font=f"{fs}p", angle=0)
+fig.text(x=-119.8, y=43.0, text="Plate", font=f"{fs}p", angle=0)
 fig.plot(x=[region1[0], region1[1], region1[1], region1[0]], y=[region1[2], region1[2], region1[3], region1[3]], pen="2p,red", close=True)
-fig.text(position='TL', text='(a)', font='12p,Helvetica-Bold', offset='-0.5c/0.5c', no_clip=True)
+fig.text(position='TL', text='(a)', font=f'{fs}p,Helvetica-Bold', offset='-0.4c/0.4c', no_clip=True)
 
 # ##############################################################################################################################################################################################################################################################################
 # ##############################################################################################################################################################################################################################################################################
@@ -163,15 +165,17 @@ fig.shift_origin(xshift='21c')
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['SM', 'GPS'])]
 
 region = [-125.2, t_stations.lon.max()+0.1, t_stations.lat.min()-0.1, t_stations.lat.max()+0.1]
-fig.coast(region=region, projection='M8.15c', frame=['lSnE', 'xa1.0', 'ya2'], land='lightgray', water='lightblue', area_thresh=10000, shorelines="1/0.5p,black")
-fig.text(position='TL', text='(b)', font='12p,Helvetica-Bold', offset='-0.5c/0.5c', no_clip=True)
+region = [-127.0, t_stations.lon.max()+0.1, t_stations.lat.min()-1.5, t_stations.lat.max()+1.5]
+
+fig.coast(region=region, projection='M7.39c', frame=['lSnE', 'xa2.0', 'ya2'], land='lightgray', water='lightblue', area_thresh=10000, shorelines="1/0.5p,black")
+fig.text(position='TL', text='(b)', font=f'{fs}p,Helvetica-Bold', offset='-0.5c/0.5c', no_clip=True)
 
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['GPS'])]
 fig.plot(x=t_stations.lon, y=t_stations.lat, style='t0.3c', fill='green', label='GNSS')
 t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['SM'])]
-fig.plot(x=t_stations.lon, y=t_stations.lat, style='t0.3c', fill='blue', label='Strong Motion')
-fig.plot(x=[10], y=[10], style='t0.3c', fill='black', label='Surface Waves')
-fig.plot(x=[10], y=[10], style='s0.2c', fill='cyan', label='Teleseismic')
+fig.plot(x=t_stations.lon, y=t_stations.lat, style='t0.3c', fill='blue', label='Strong motion')
+fig.plot(x=[10], y=[10], style='t0.3c', fill='black', label='Surface waves')
+fig.plot(x=[10], y=[10], style='s0.2c', fill='cyan', label='Body waves')
 
 
 
@@ -195,5 +199,5 @@ t_stations = kinematic_inv_stations[kinematic_inv_stations.type.isin(['body'])]
 fig.plot(x=t_stations.lon, y=t_stations.lat, style='s0.2c', fill='cyan')
 fig.plot(x=event_data.longitude, y=event_data.latitude, style='a0.5c', fill='yellow', pen='0.2p,black')
 fname = "fig1.pdf"
-fig.savefig('fig1.pdf')
+fig.savefig('fig1.pdf', crop='0.1c')
 print(f"done writing {fname}")
