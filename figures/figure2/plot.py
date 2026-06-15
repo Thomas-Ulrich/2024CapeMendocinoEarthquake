@@ -48,7 +48,14 @@ kinematic_inv_gnss_syn = pd.read_csv('./kinematic_inv_gnss_syn.csv')
 
 cpt = Cpt('./slip.cpt')
 
-stf = pd.read_csv('./stf.csv')
+
+stf = pd.read_csv(
+    "STF.txt",
+    skiprows=2,
+    sep=r"\s+",
+    names=["time", "Moment_Rate"],
+    engine="python",
+)
 
 back_projection = pd.read_csv('../figure1/back_projection.csv')
 
