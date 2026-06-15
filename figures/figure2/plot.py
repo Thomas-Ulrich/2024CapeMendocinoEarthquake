@@ -65,7 +65,7 @@ cpt = Cpt('./slip.cpt')
 
 
 stf = pd.read_csv(
-    "STF.txt",
+    "STF_2faults_t.txt",
     skiprows=2,
     sep=r"\s+",
     names=["time", "Moment_Rate"],
@@ -183,17 +183,21 @@ fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 
 
 
-fig.basemap(map_scale="n0.07/0.81+w10k+f+u")
+#fig.basemap(map_scale="n0.07/0.81+w10k+f+u")
+fig.basemap(map_scale="n0.45/0.05+w40k+f+u")
 fig.text(position='TL', no_clip=True, text='(e)', font='12p,Helvetica,black', offset='-0.8c/0.7c')
-fig.shift_origin(yshift='7.6c')
+#fig.shift_origin(yshift='7.6c')
+fig.shift_origin(yshift='8.6c')
 #################################################################################################################################################################################################################################
 # inset
 region3=[-125.32, -124, 40.1, 40.7]
+#region3=[-126.32, -124, 40.1, 40.7]
 
 fig.coast(
     frame=['tblr', 'xa0.5f0.1', 'ya0.5f0.1'],
-    projection=f"M7",
+    projection=f"Q7",
     region=region3,
+    shorelines='0.5p,black',
     land='lightgray',
     water='lightblue'
 )
@@ -205,7 +209,8 @@ fig.plot(
     #label='Lomax catalog'
 )
 
-fig.plot(data='../figure1/output.gmt', pen='1p,black', close=True)
+#fig.plot(data='../figure1/output.gmt', pen='1p,black', close=True)
+fig.plot(data='./faults.gmt', pen='0.5p,black')
 fig.plot(data='../figure1/SAF_Men.gmt', pen='2p,red')
 fig.plot(data='../figure1/cascedia.gmt', pen='2p,red')
 
@@ -235,7 +240,8 @@ event_data = pd.concat([event_data, focal_df], axis=1)
 fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 # Plot the beachball using GCMT convention
 #fig.meca(spec=event_data, scale="1.5c", offset=True)
-fig.text(x=-125.0, y=40.345, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='8p', angle=0, offset='0/-0.5c')
+#fig.text(x=-125.0, y=40.345, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='8p', angle=0, offset='0/-0.5c')
+fig.basemap(map_scale="n0.45/0.15+w40k+f+u")
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-125.83, y=40.45, style="v0.5c+ea+r+h0.1+a35", direction=([180], [1.5]), pen="1p,red", fill="red")
@@ -246,10 +252,11 @@ fig.plot(x=back_projection.lon, y=back_projection.lat, style="dd", size=0.4 * ba
 with pygmt.config(FONT_LABEL='24p,Helvetica,black', FONT_ANNOT_PRIMARY='24p,Helvetica,black'):
     fig.colorbar(
         cmap='../figure1/back_projection.cpt',  # Use the same colormap as in the mec plot
-        position="JBR+w3c/0.3c+o0.1c/-3.5c",  # Position of the color bar
+        #position="JBR+w3c/0.3c+o0.1c/-3.5c",  # Position of the color bar
+        position="JBR+w3c/0.3c+o0.1c/-3.0c",  # Position of the color bar
         frame='af+lTime (s)' # Label the color bar
     )
-fig.shift_origin(yshift='-7.6c')
+fig.shift_origin(yshift='-8.6c')
 
 ### panel b #####
 fig.shift_origin(yshift='15.0c')
@@ -260,7 +267,9 @@ fig.image(imagefile="output/normal.png", position="x12/-3.0+w8.0c")
 
 fig.image(imagefile="output/normal-flip.png", position="x12/0.2+w8.0c")
 #fig.text(x=12, y=2.2, text="view from North", font="10p,Helvetica-Bold,black", justify="CM", no_clip=True)
-fig.text(position='TL', no_clip=True, text='(d)', font='12p,Helvetica,black', offset='12.2c/-0.25c')
+fig.text(position='TL', no_clip=True, text='(d)', font='12p,Helvetica,black', offset='12.2c/0.75c')
+fig.text(position='TL', no_clip=True, text='view from south', font='12p,Helvetica,black', offset='14.0c/-2.25c')
+fig.text(position='TL', no_clip=True, text='view from north', font='12p,Helvetica,black', offset='14.0c/-5.50c')
 
 
 total_width = 10
@@ -274,8 +283,8 @@ km_per_cm = p1_xmax / total_width  # 84/18.7 ~ 4.49 km/cm
 p2_width = p2_xmax / km_per_cm     # 72/4.49 ~ 16.04c
 p1_height = p1_ymax / km_per_cm    # 27/4.49 ~ 6.01c
 p2_height = p2_ymax / km_per_cm    # 12/4.49 ~ 2.67c
-gap = 1.0
-
+gap = 0.8
+#gap = -4.0
 # panel b1
 fig.basemap(projection=f'X{total_width}c/{p1_height:.2f}c', region=[0, p1_xmax, -p1_ymax, 0],
             frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
@@ -312,22 +321,22 @@ with pygmt.config(FONT_LABEL='20p,Helvetica,black', FONT_ANNOT_PRIMARY='20p,Helv
 
 ### panel b inset ###
 fig.shift_origin(yshift='4.0c', xshift='13.0c')
-fig.text(position='TL', no_clip=True, text='(c)', font='12p,Helvetica,black', offset='-0.8c/2.0c')
+fig.text(position='TL', no_clip=True, text='(c)', font='12p,Helvetica,black', offset='-0.8c/2.5c')
 ta,tb = -10, 40
 with pygmt.config(FONT_LABEL='8p,Helvetica-Bold,black', FONT_ANNOT_PRIMARY='8p,Helvetica-Bold,black'):
-    fig.basemap(projection='X6c/3c', region=[ta, tb, 0.001, 6], frame=['tblr+gwhite'])
+    fig.basemap(projection='X6.5c/3.2c', region=[ta, tb, 0.001, 6], frame=['tblr+gwhite'])
 fig.plot(x=stf.time, y=stf.Moment_Rate / 1e18, pen='0.3p,black', close=True, fill='gray')
 ymax = np.amax(stf.Moment_Rate / 1e18)
 fig.plot(x=back_projection.time, y=ymax * back_projection.beam_power, pen='0.3p,blue', close=False)
 with pygmt.config(FONT_LABEL='6p,Helvetica-Bold,black', FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,black', MAP_FRAME_TYPE='inside'):
-    fig.basemap(projection='X6c/3c', region=[ta, tb, 0.001, 6], frame=['lNbE', 'xa10f5+lTime [s]', 'ya1+lMoment Rate [Nm @[10^{18}@[]'])
+    fig.basemap(projection='X6.5c/3.2c', region=[ta, tb, 0.001, 6], frame=['lNbE', 'xa10f5+lTime [s]', 'ya1+lMoment Rate [Nm @[10^{18}@[]'])
 with pygmt.config(FONT_LABEL='6p,Helvetica-Bold,blue', FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,blue', MAP_FRAME_TYPE='inside'):
-    fig.basemap(projection='X6c/3c', region=[ta, tb, 0.001, 6/ymax], frame=['lW', 'ya0.5+lBeam Power'])
+    fig.basemap(projection='X6.5c/3.2c', region=[ta, tb, 0.001, 6/ymax], frame=['lW', 'ya0.5+lBeam Power'])
 
 
 ### panel a #####
 #fig.shift_origin(yshift='7.5c')
-fig.shift_origin(yshift='0.0c', xshift='-13.0c')
+fig.shift_origin(yshift='0.2c', xshift='-13.0c')
 #fig.basemap(projection='X18.7c/5.6c', region=[0, 88.8, -20., 0], frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
 fig.basemap(projection='X10.0c/3.0c', region=[0, 88.8, -20., 0], frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
 for i, row in static_inv.iterrows():
@@ -340,11 +349,8 @@ if plot_seismicity:
     fig.plot(x = repeating_cat.along_stk_disloc, y=-repeating_cat.depth, style='c0.1c', fill='red', label='repeating earthquakes')
     fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
 
-fig.text(position='TL', no_clip=True, text='(a)', font='12p,Helvetica,black', offset='-0.8c/0.5c')
+fig.text(position='TL', no_clip=True, text='(a)', font='12p,Helvetica,black', offset='-0.8c/0.7c')
 fig.legend(position='n0.01/0.01', box='+ggray')
-
-
-
 
 fn = './fig2.pdf'
 fig.savefig(fn, crop="0.2c")
