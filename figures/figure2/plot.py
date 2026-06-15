@@ -43,7 +43,22 @@ p1 = pd.read_csv('./Solution_p1.csv')
 p2 = pd.read_csv('./Solution_p2.csv')
 
 kinematic_inv = pd.read_csv('./kinematic_inv.csv')
-kinematic_inv_gnss_syn = pd.read_csv('./kinematic_inv_gnss_syn.csv')
+
+# Read the file
+kinematic_inv_gnss_syn = pd.read_csv(
+    "static_synthetics.txt",
+    skiprows=1,
+    sep=r"\s+",
+    header=None,
+    engine="python",
+)
+kinematic_inv_gnss_syn = kinematic_inv_gnss_syn.drop(columns=[0])#.copy()
+# Assign column names
+kinematic_inv_gnss_syn.columns = ["id", "lat", "lon", "Up", "N", "E"]
+kinematic_inv_gnss_syn["E"] *= 0.01
+kinematic_inv_gnss_syn["N"] *= 0.01
+kinematic_inv_gnss_syn["Up"] *= 0.01
+
 
 
 cpt = Cpt('./slip.cpt')
