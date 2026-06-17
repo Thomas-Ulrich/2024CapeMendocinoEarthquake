@@ -65,7 +65,7 @@ cpt = Cpt('./slip.cpt')
 
 
 stf = pd.read_csv(
-    "STF_2faults_t.txt",
+    "../../data/STF_2faults_t.txt",
     skiprows=2,
     sep=r"\s+",
     names=["time", "Moment_Rate"],
@@ -350,7 +350,8 @@ if plot_seismicity:
     fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
 
 fig.text(position='TL', no_clip=True, text='(a)', font='12p,Helvetica,black', offset='-0.8c/0.7c')
-fig.legend(position='n0.01/0.01', box='+ggray')
+if plot_seismicity:
+    fig.legend(position='n0.01/0.01', box='+ggray')
 
 fn = './fig2.pdf'
 fig.savefig(fn, crop="0.2c")
