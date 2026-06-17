@@ -245,7 +245,7 @@ fig.basemap(map_scale="n0.45/0.15+w40k+f+u")
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-125.83, y=40.45, style="v0.5c+ea+r+h0.1+a35", direction=([180], [1.5]), pen="1p,red", fill="red")
-fig.plot(x=back_projection.lon, y=back_projection.lat, style="dd", size=0.4 * back_projection.beam_power, fill=back_projection.time, cmap='../figure1/back_projection.cpt', pen='0.5p')
+fig.plot(x=back_projection.lon, y=back_projection.lat, style="d", size=0.4 * back_projection.beam_power, fill=back_projection.time, cmap='../figure1/back_projection.cpt', pen='0.5p')
 
 
 # Add the color bar for depth
