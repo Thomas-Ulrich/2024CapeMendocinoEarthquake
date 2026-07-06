@@ -7,33 +7,33 @@
     "segments": [
         {
             "delay_segment": 0,
-            "delta_dip": 2.85,
-            "delta_strike": 3.6959999999999997,
-            "dip": 90.0,
-            "dip_subfaults": 10,
+            "delta_dip": 3.0,
+            "delta_strike": 3.0,
+            "dip": 85,
+            "strike": 95,
+            "dip_subfaults": 9,
+            "stk_subfaults": 28,
             "hyp_dip": 4,
-            "hyp_stk": 7,
-            "max_vel": 3.125,
+            "hyp_stk": 9,
+            "max_vel": 6.0,
             "min_vel": 1.0,
             "neighbours": [],
-            "rake": -170.17294404607912,
-            "rupture_vel": 2.5,
-            "stk_subfaults": 24,
-            "strike": 98.0
+            "rake": 180.0,
+            "rupture_vel": 4.0
         },
         {
             "delay_segment": 0,
-            "delta_dip": 3.3,
+            "delta_dip": 3.0,
             "delta_strike": 3.7,
             "dip": 12,
-            "dip_subfaults": 9,
+            "dip_subfaults": 10,
             "hypocenter": {"lon": -124.78, "lat": 40.35, "depth": 8.0},
             "hyp_dip": 1,
-            "hyp_stk": 5,
+            "hyp_stk": 6,
             "neighbours": [],
             "rake": 90,
             "rupture_vel": 2.5,
-            "stk_subfaults": 15,
+            "stk_subfaults": 18,
             "strike": 335
         }
     ]
