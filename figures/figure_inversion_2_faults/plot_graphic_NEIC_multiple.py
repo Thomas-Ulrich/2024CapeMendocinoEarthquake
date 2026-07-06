@@ -119,6 +119,8 @@ def plot_waveforms(
         else:
             ax.plot(time, waveform, color=color, linewidth=2 * weight)
         min_time, max_time = ax.get_xlim()
+        if len(time) == 0:
+            continue
         min_time = np.minimum(np.min(time), min_time)
         max_time = np.maximum(np.max(time), max_time)
         if custom == "fill":
@@ -446,6 +448,7 @@ def retrieve_addition_traces(directory, data_type, stations=None):
     additional_traces_info = []
     with open(directory / config_file) as t:
         additional_traces_info = json.load(t)
+
     additional_traces_info = get_outputs.get_data_dict(
         additional_traces_info,
         syn_file=syn_file,
@@ -503,6 +506,8 @@ def plot_misfit(
                 plot_directory=directory,
                 additional_files=additional_traces_info,
             )
+
+
     if "surf" in used_data_type:
         if not os.path.isfile(directory / "surf_waves.json"):
             raise FileNotFoundError(
