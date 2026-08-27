@@ -106,12 +106,14 @@ fig.plot(
 
 plot_pygmt_fault_planes_background(fig, "Solution.param")
 cc = 100
-fig.plot(
-    x=background.lon,
-    y=background.lat,
-    style="c0.05c",
-    fill=f'{cc}/{cc}/{cc}',
-)
+
+#fig.plot(
+#    x=background.lon,
+#    y=background.lat,
+#    style="c0.05c",
+#    fill=f'{cc}/{cc}/{cc}',
+#)
+
 fig.plot(
     x=repeating_cat.lon,
     y=repeating_cat.lat,
@@ -360,6 +362,8 @@ fig.plot(x = mainshock.along_stk_disloc-main_x, y=-mainshock.depth, style='a0.5c
 fig.plot(x = repeating_cat.along_stk_disloc-main_x, y=-repeating_cat.depth, style='c0.1c', fill='red', label='repeaters')
 if plot_seismicity:
     fig.plot(x = background.along_stk_disloc-main_x, y=-background.depth, style='c0.05c', fill=f'{cc}/{cc}/{cc}', label='background')
+#else:
+#    fig.plot(x = 999, y=999, style='c0.05c', fill=f'{cc}/{cc}/{cc}', label='background')
 
 fig.plot(x = cat_on_fault.along_stk_disloc-main_x, y=-cat_on_fault.depth, style='c0.1c', fill='cyan', label='aftershocks')
 
