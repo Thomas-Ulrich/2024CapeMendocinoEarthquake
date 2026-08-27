@@ -49,9 +49,13 @@ fig.plot(data='./output.gmt', pen='0.1p,black', close=True)
 fig.plot(data='./SAF_Men.gmt', pen='2p,red')
 fig.plot(data='./cascedia.gmt', pen='2p,red', style='f1.5c/0.5c+r+t+p0.5p,red')
 
+from fault_plane_plotting import plot_pygmt_fault_planes
+plot_pygmt_fault_planes(fig, "Solution.param")
 fig.meca(spec=cmt_small.iloc[:, 3:], longitude=cmt_small.lon, latitude=cmt_small.lat, scale=0.25, pen='0.5p', convention='mt', depth=cmt_small.depth, cmap='cmt.cpt')
 fig.meca(spec=cmt_large.iloc[:, 3:], longitude=cmt_large.lon, latitude=cmt_large.lat, scale=0.5, pen='0.5p', convention='mt', depth=cmt_large.depth, cmap='cmt.cpt', event_name=cmt_large.name)
 # this event is used separately because the label is overprinted
+
+
 fig.meca(spec=cmt_large2.iloc[:, 3:], longitude=cmt_large2.lon, latitude=cmt_large2.lat, scale="0.5+o0/-1.0", pen='0.5p', convention='mt', depth=cmt_large2.depth, cmap='cmt.cpt', event_name=cmt_large2.name)
 
 aki_single = {"strike": 150, "dip": 47, "rake": 30, "magnitude": 7.2}
@@ -91,7 +95,8 @@ span_1994={'lon':[-126.046, -125.286], 'lat':[40.422, 40.381]}
 span_2024={'lon':[-125.247, -124.490], 'lat':[40.383, 40.303]}
 
 fig.plot(x=span_1994["lon"], y=span_1994["lat"], pen = "10p,black@80%")
-fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
+#fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
+
 
 #coordinates of the 1992 fault plane
 #Murray et al., 1994, model A
