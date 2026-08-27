@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import pygmt
+from fault_plane_plotting import plot_pygmt_fault_planes, plot_pygmt_fault_planes_background, plot_pygmt_fault_planes_trace
 
 class Cpt:
     def __init__(self, cpt):
@@ -19,6 +20,7 @@ class Cpt:
             return self.cpt_o.iloc[1, 1]
         else:
             return self.cpt.iloc[idx, 1]
+
 
 cat = pd.read_csv('./aftershocks.csv')
 cat['time'] = pd.to_datetime(cat['time'])
@@ -78,10 +80,10 @@ span_2024={'lon':[-125.247, -124.490], 'lat':[40.383, 40.303]}
 
 
 plot_kinematic = True
-plot_seismicity  = True
+plot_seismicity  = False
 
 
-region=[-125.3, -123.6, 40, 41]
+region=[-125.32, -123.6, 40, 41.015]
 fig = pygmt.Figure()
 pygmt.config(FORMAT_GEO_MAP='ddd.xx', MAP_FRAME_TYPE='plain')
 
@@ -102,26 +104,29 @@ fig.plot(
     pen="1p,black",
 )
 
-if plot_seismicity:
-    cc = 100
-    fig.plot(
-        x=background.lon,
-        y=background.lat,
-        style="c0.05c",
-        fill=f'{cc}/{cc}/{cc}',
-    )
-    fig.plot(
-        x=repeating_cat.lon,
-        y=repeating_cat.lat,
-        style="c0.1c",
-        fill='red',
-    )
-    fig.plot(
-        x=cat.lon,
-        y=cat.lat,
-        style="c0.07c",
-        fill="cyan",
-    )
+plot_pygmt_fault_planes_background(fig, "Solution.param")
+cc = 100
+fig.plot(
+    x=background.lon,
+    y=background.lat,
+    style="c0.05c",
+    fill=f'{cc}/{cc}/{cc}',
+)
+fig.plot(
+    x=repeating_cat.lon,
+    y=repeating_cat.lat,
+    style="c0.1c",
+    fill='red',
+)
+fig.plot(
+    x=cat.lon,
+    y=cat.lat,
+    style="c0.07c",
+    fill="cyan",
+)
+plot_pygmt_fault_planes_trace(fig, "Solution.param")
+
+
 
 spec="e60/0.39+f18"
 
@@ -179,7 +184,7 @@ fig.text(x=-125.25, y=40.1, text='3 cm', font="10p", offset='0.8c/0.5c')
 fig.text(x=-125.25, y=40.07, text='Static inversion', font="10p", offset='3.5c/0.0c')
 fig.text(x=-125.25, y=40.1, text='Data', font="10p", offset='3.5c/0.0c')
 
-fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
+#fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 
 
 
@@ -237,7 +242,7 @@ event_data = pd.DataFrame({
 # Add the focal mechanism DataFrame to the event DataFrame
 event_data = pd.concat([event_data, focal_df], axis=1)
 
-fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
+#fig.plot(x=span_2024["lon"], y=span_2024["lat"], pen = "10p,black@50%")
 # Plot the beachball using GCMT convention
 #fig.meca(spec=event_data, scale="1.5c", offset=True)
 #fig.text(x=-125.0, y=40.345, text='December 5, 2024 @[M_{\\textrm{w}}@[7.0', font='8p', angle=0, offset='0/-0.5c')
@@ -245,6 +250,7 @@ fig.basemap(map_scale="n0.45/0.15+w40k+f+u")
 
 fig.plot(x=-126.15, y=40.38, style="v0.5c+ea+r+h0.1+a35", direction=([0], [1.5]), pen="1p,red", fill="red")
 fig.plot(x=-125.83, y=40.45, style="v0.5c+ea+r+h0.1+a35", direction=([180], [1.5]), pen="1p,red", fill="red")
+plot_pygmt_fault_planes(fig, "Solution.param")
 fig.plot(x=back_projection.lon, y=back_projection.lat, style="d", size=0.4 * back_projection.beam_power, fill=back_projection.time, cmap='../figure1/back_projection.cpt', pen='0.5p')
 
 
@@ -286,21 +292,26 @@ p2_height = p2_ymax / km_per_cm    # 12/4.49 ~ 2.67c
 gap = 0.8
 #gap = -4.0
 # panel b1
-fig.basemap(projection=f'X{total_width}c/{p1_height:.2f}c', region=[0, p1_xmax, -p1_ymax, 0],
+main_x = mainshock.along_stk_disloc[0]+5
+
+fig.basemap(projection=f'X{total_width}c/{p1_height:.2f}c', region=[-25, 70, -p1_ymax, 0],
             frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
+
+print(mainshock)
 for i, row in p1.iterrows():
     stk_idx = i % 28
     dip_idx = i // 28
     r, l = stk_idx * 3.0, (stk_idx + 1) * 3.0
     t, b = dip_idx * 3.0, (dip_idx + 1) * 3.0
+    r,l = [v-main_x for v in [r,l]]
     fig.plot(x=[r, l, l, r], y=-np.array([t, t, b, b]), pen='0.5p,gray', close=True, fill=cpt(row.slip*1e-2))
 
 cc = 100
+fig.plot(x = 0.0, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
+fig.plot(x = repeating_cat.along_stk_disloc-main_x+5, y=-repeating_cat.depth, style='c0.1c', fill='red')
 if plot_seismicity:
-    fig.plot(x = background.along_stk_disloc, y=-background.depth, style='c0.05c', fill=f'{cc}/{cc}/{cc}')
-    fig.plot(x = cat_on_fault.along_stk_disloc, y=-cat_on_fault.depth, style='c0.1c', fill='cyan')
-    fig.plot(x = repeating_cat.along_stk_disloc, y=-repeating_cat.depth, style='c0.1c', fill='red')
-    fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
+    fig.plot(x = background.along_stk_disloc-main_x, y=-background.depth, style='c0.05c', fill=f'{cc}/{cc}/{cc}')
+fig.plot(x = cat_on_fault.along_stk_disloc-main_x, y=-cat_on_fault.depth, style='c0.1c', fill='cyan')
 
 # panel b2
 fig.shift_origin(yshift=f'-{p2_height + gap:.2f}c')
@@ -338,20 +349,22 @@ with pygmt.config(FONT_LABEL='6p,Helvetica-Bold,blue', FONT_ANNOT_PRIMARY='6p,He
 #fig.shift_origin(yshift='7.5c')
 fig.shift_origin(yshift='0.2c', xshift='-13.0c')
 #fig.basemap(projection='X18.7c/5.6c', region=[0, 88.8, -20., 0], frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
-fig.basemap(projection='X10.0c/3.0c', region=[0, 88.8, -20., 0], frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
+main_x = mainshock.along_stk_disloc[0]
+fig.basemap(projection='X10.0c/3.0c', region=[-25, 70, -20., 0], frame=['WbNr', 'xa10f5', 'ya5+lalong dip [km]'])
+
 for i, row in static_inv.iterrows():
-    fig.plot(x=[row.r, row.l, row.l, row.r], y=-np.array([row.t, row.t, row.b, row.b]), pen='0.5p,gray', close=True, fill=cpt(row.slip))
+    fig.plot(x=[v - main_x for v in [row.r, row.l, row.l, row.r]], y=-np.array([row.t, row.t, row.b, row.b]), pen='0.5p,gray', close=True, fill=cpt(row.slip))
 cc = 100
 
+fig.plot(x = mainshock.along_stk_disloc-main_x, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
+fig.plot(x = repeating_cat.along_stk_disloc-main_x, y=-repeating_cat.depth, style='c0.1c', fill='red', label='repeaters')
 if plot_seismicity:
-    fig.plot(x = background.along_stk_disloc, y=-background.depth, style='c0.05c', fill=f'{cc}/{cc}/{cc}', label='background seismicity')
-    fig.plot(x = cat_on_fault.along_stk_disloc, y=-cat_on_fault.depth, style='c0.1c', fill='cyan', label='aftershocks')
-    fig.plot(x = repeating_cat.along_stk_disloc, y=-repeating_cat.depth, style='c0.1c', fill='red', label='repeating earthquakes')
-    fig.plot(x = mainshock.along_stk_disloc, y=-mainshock.depth, style='a0.5c', fill='yellow', pen='0.5p,black')
+    fig.plot(x = background.along_stk_disloc-main_x, y=-background.depth, style='c0.05c', fill=f'{cc}/{cc}/{cc}', label='background')
+
+fig.plot(x = cat_on_fault.along_stk_disloc-main_x, y=-cat_on_fault.depth, style='c0.1c', fill='cyan', label='aftershocks')
 
 fig.text(position='TL', no_clip=True, text='(a)', font='12p,Helvetica,black', offset='-0.8c/0.7c')
-if plot_seismicity:
-    fig.legend(position='n0.01/0.01', box='+ggray')
+fig.legend(position='n1.02/0.01', box='+ggray')
 
 fn = './fig2.pdf'
 fig.savefig(fn, crop="0.2c")
