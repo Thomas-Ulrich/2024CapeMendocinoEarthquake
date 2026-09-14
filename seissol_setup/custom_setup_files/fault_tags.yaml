@@ -12,8 +12,14 @@
           map:
             fault_tag: 65
      - !GroupFilter
-        groups: 66
-        #cascadia
+        groups: 100
+        # San Andreas
         components: !ConstantMap
           map:
-            fault_tag: 66
+            fault_tag: 100
+     - !GroupFilter
+        groups: 101
+        # Cascadia
+        components: !ConstantMap
+          map:
+            fault_tag: 101
