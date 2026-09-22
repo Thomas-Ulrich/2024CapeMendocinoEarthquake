@@ -147,19 +147,15 @@ def write_vtk(segments, outfile, projection, tolerance=1.0):
         f.write("# vtk DataFile Version 3.0\n")
         f.write("Kinematic fault model (KDTree Merged Points)\n")
         f.write("ASCII\n")
-        f.write("DATASET UNSTRUCTURED_GRID\n\n")
+        f.write("DATASET POLYDATA\n\n")
 
         f.write(f"POINTS {npts} float\n")
         for p in unique_points:
             f.write(f"{p[0]:.3f} {p[1]:.3f} {p[2]:.3f}\n")
 
-        f.write(f"\nCELLS {ncells} {ncells * 5}\n")
+        f.write(f"\nPOLYGONS {ncells} {ncells * 5}\n")
         for cell in all_cells:
             f.write(f"4 {cell[0]} {cell[1]} {cell[2]} {cell[3]}\n")
-
-        f.write(f"\nCELL_TYPES {ncells}\n")
-        for _ in all_cells:
-            f.write("9\n")  # VTK_QUAD
 
         f.write(f"\nCELL_DATA {ncells}\n")
 
