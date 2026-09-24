@@ -1,0 +1,40 @@
+[
+    {
+        "max_center_slip": 700,
+        "max_left_slip": 700,
+        "max_lower_slip": 700,
+        "max_right_slip": 700,
+        "max_slip_delta": 700,
+        "max_upper_slip": 700,
+        "min_slip": 0,
+        "rake_max": 240,
+        "rake_min": 120,
+        "rake_step": 51,
+        "regularization": {
+            "neighbour_down": null,
+            "neighbour_left": null,
+            "neighbour_right": null,
+            "neighbour_up": null
+        },
+        "slip_step": 31
+    },
+    {
+        "max_center_slip": 700,
+        "max_left_slip": 700,
+        "max_lower_slip": 700,
+        "max_right_slip": 700,
+        "max_slip_delta": 700,
+        "max_upper_slip": 700,
+        "min_slip": 0,
+        "rake_max": 120.0,
+        "rake_min": 60.0,
+        "rake_step": 26,
+        "regularization": {
+            "neighbour_down": null,
+            "neighbour_left": null,
+            "neighbour_right": null,
+            "neighbour_up": null
+        },
+        "slip_step": 31
+    }
+]

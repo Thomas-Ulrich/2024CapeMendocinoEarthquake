@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -euox pipefail
 
 #lon=124.5
 lon=124.75
@@ -29,8 +29,13 @@ copy_results_to_plots_and_rename() {
   if [ -f misfit_details.txt ]; then
     mv misfit_details.txt plots
   fi
+
   # Step 2: rename/move 'plots' to the destination folder name
+  if [ -d "../$dest" ]; then
+    rm -rf "../$dest"
+  fi
   mv plots ../$dest
+
 }
 
 mkdir -p $myfolder && cd $myfolder
@@ -87,11 +92,15 @@ if [[ "$rerun_gnss" == "y" ]]; then
     cp "input_data/model_space_vardip.json" "$suffix/model_space.json"
   elif [[ $myfolder == re98* ]]; then
     echo "using strike 98 base fault model"
-    cp input_data/segments_data.json ${myfolder}_$suffix
+    cp input_data/segments_data.json $suffix
     cp input_data/model_space_vardip.json $suffix/model_space.json
-  elif [[ $myfolder == with_cascadia* ]]; then
-    cp input_data/segments_data_with_cascadia.json ${myfolder}_$suffix/segments_data.json
-    cp input_data/model_space_with_cascadia.json ${myfolder}_$suffix/model_space.json
+  elif [[ $myfolder == *with_cascadia* ]]; then
+    #cp input_data/segments_data_with_cascadia.json $suffix/segments_data.json
+    #cp input_data/model_space_with_cascadia.json $suffix/model_space.json
+    #cp input_data/tensor_info_lower.json $suffix/tensor_info.json
+    cp input_data/segments_data_with_cascadia_new90.json $suffix/segments_data.json
+    cp input_data/model_space_with_cascadia_new90.json $suffix/model_space.json
+    #cp input_data/tensor_info_lower.json $suffix/tensor_info.json
   else
     echo "$myfolder structure not understood"
     exit -1
@@ -140,6 +149,7 @@ if [[ "$rerun_gnss_tele" == "y" ]]; then
 fi
 
 if [[ "$rerun_gnss_tele_strong" == "y" ]]; then
+  echo $(pwd)
   suffix=gnss_tele
   cp -r $suffix gnss_tele_sm
   suffix=gnss_tele_sm
